@@ -1,0 +1,368 @@
+<!doctype html>
+<!--
+  Coursework Helper: Evaluate (stage 6), drafted 11 November 2026 for week 7.
+  Built on the design of this folder (style.css, and the same script as prepare.html).
+  Every paragraph on this page is new wording. Open the page with ?review on the end of the address to shade it.
+  Example outputs were run on Bank Marketing, prepared as in the week 5 and week 6 labs, with scikit-learn 1.9.1
+  and imbalanced-learn 0.14.2. The model in the examples is make_pipeline(MinMaxScaler(), LogisticRegression()).
+-->
+<html lang="en-GB"><head><meta charset="utf-8"><meta name="viewport" content="width=device-width,initial-scale=1">
+<title>Evaluate · Coursework Helper</title>
+<link rel="stylesheet" href="https://fonts.googleapis.com/css2?family=Source+Sans+3:wght@400;600;700&family=Source+Code+Pro:wght@400;600&display=swap">
+<link rel="stylesheet" href="style.css">
+<style>
+  .figbox.small{max-width:30rem}
+  body.review [data-draft]{background:#FFF6D6;box-shadow:0 0 0 3px #FFF6D6;border-radius:3px}
+</style>
+</head><body>
+<div class="topbar"></div>
+<div class="masthead"><a class="brand" href="index.html">CM3151 / CMM548 · Coursework Helper</a><span class="crumbs">› Stage 6 · Evaluate · Week 7</span>
+<div class="namesdock"><button class="namesbtn" id="namesbtn" aria-expanded="false">Your names: <code id="nm-df">df</code> · <code id="nm-target">target</code> <span class="chev">▾</span></button>
+<div class="namespanel" id="namespanel" hidden><p>Type the names from your own notebook once. Every code block on the page changes to match, and they are remembered on this computer.</p>
+<label>Your table <input data-key="df" value="df"></label><label>Your target column <input data-key="target" value="target"></label><label>Your trained model <input data-key="model" value="model"></label></div></div></div>
+<main class="wrap">
+<h1>Evaluate</h1>
+<div class="intro-text"><p>In the last stage, we trained our models and wrote down one score for each. In this stage, we find out what that score is hiding, check that we can trust it, and try to improve it. The evaluation stage can be broken into three core questions: What mistakes does it make? Can I trust the score? Can I improve it? The code on this page uses the names from the labs (<code>X_train</code>, <code>X_test</code>, <code>y_train</code> and <code>y_test</code>) and a model that you have already trained.</p></div>
+
+<div class="model" id="model">
+  <a class="panel" href="#g-mistakes" data-group="mistakes">
+    <svg viewBox="0 0 200 120" fill="none" stroke="#682773" stroke-width="2" stroke-linecap="round">
+      <rect x="50" y="14" width="100" height="92" rx="5" fill="#fff"/>
+      <path d="M100 14v92M50 60h100" stroke="#D8CDDD"/>
+      <path d="M66 37l7 7 13-15" stroke="#2E8B57" stroke-width="2.6"/>
+      <path d="M116 85l7 7 13-15" stroke="#2E8B57" stroke-width="2.6"/>
+      <path d="M116 28l18 18M134 28l-18 18" stroke="#C9742C" stroke-width="2.6"/>
+      <path d="M66 74l18 18M84 74l-18 18" stroke="#C9742C" stroke-width="2.6"/>
+    </svg>
+    <h2>What mistakes does it make?</h2><p>Count the right and wrong guesses for each answer, and turn the counts into precision, recall and F1.</p>
+  </a>
+  <a class="panel" href="#g-trust" data-group="trust">
+    <svg viewBox="0 0 200 120" fill="none" stroke="#682773" stroke-width="2" stroke-linecap="round">
+      <g stroke="#D8CDDD">
+        <rect x="30" y="14" width="140" height="13" rx="3" fill="#fff"/><rect x="30" y="34" width="140" height="13" rx="3" fill="#fff"/>
+        <rect x="30" y="54" width="140" height="13" rx="3" fill="#fff"/><rect x="30" y="74" width="140" height="13" rx="3" fill="#fff"/>
+        <rect x="30" y="94" width="140" height="13" rx="3" fill="#fff"/>
+      </g>
+      <rect x="30" y="14" width="28" height="13" rx="3" fill="#F9EBDD" stroke="#C9742C"/>
+      <rect x="58" y="34" width="28" height="13" rx="3" fill="#F9EBDD" stroke="#C9742C"/>
+      <rect x="86" y="54" width="28" height="13" rx="3" fill="#F9EBDD" stroke="#C9742C"/>
+      <rect x="114" y="74" width="28" height="13" rx="3" fill="#F9EBDD" stroke="#C9742C"/>
+      <rect x="142" y="94" width="28" height="13" rx="3" fill="#F9EBDD" stroke="#C9742C"/>
+    </svg>
+    <h2>Can I trust the score?</h2><p>Compare the training score with the test score, and give every row a turn at being tested.</p>
+  </a>
+  <a class="panel" href="#g-improve" data-group="improve">
+    <svg viewBox="0 0 200 120" fill="none" stroke="#682773" stroke-width="2" stroke-linecap="round">
+      <path d="M30 34h140M30 60h140M30 86h140" stroke="#D8CDDD" stroke-width="4"/>
+      <circle cx="70" cy="34" r="9" fill="#fff"/><circle cx="128" cy="60" r="9" fill="#F9EBDD" stroke="#C9742C"/><circle cx="96" cy="86" r="9" fill="#fff"/>
+      <path d="M150 104l14-14M164 90h-9M164 90v9" stroke="#2E8B57" stroke-width="2.4"/>
+    </svg>
+    <h2>Can I improve it?</h2><p>Change which mistakes the model makes, or search for better settings.</p>
+  </a>
+</div>
+
+<div id="layout">
+
+<!-- ============================================================ 1 -->
+<div class="group" id="g-mistakes" hidden>
+<p class="gintro">A single score tells us how often the model is right, but it hides which kind of mistake the model makes when it is wrong. The two kinds rarely cost the same, so the questions below split the score up.</p>
+
+<section class="q" id="q-matrix"><button class="qhead" aria-expanded="false"><span class="title">How do I see which mistakes my model makes?<small>A confusion matrix counts the model's guesses against what really happened, with one box for each combination.</small></span><span class="chev">▾</span></button>
+<div class="qbody"><div class="qinner">
+<p>First, we ask the trained model for its guess on every row of the test set. We keep the guesses in a variable, so that we can use them again in the next question.</p>
+<div class="extra"><span class="tag">Interactive</span> Type the name of your trained model <input data-key="model" value="model">, then run the code below.</div>
+<div class="codebox"><button class="copy">Copy</button><pre data-code="guesses = {model}.predict(X_test)"></pre></div>
+<p>Then <code>confusion_matrix</code> counts how many rows fall into each combination of what really happened and what the model guessed:</p>
+<div class="codebox"><button class="copy">Copy</button><pre data-code="from sklearn.metrics import confusion_matrix
+
+confusion_matrix(y_test, guesses)"></pre></div>
+<div class="outbox"><span class="olabel">Example output</span><pre class="o">array([[11810,   167],
+       [ 1294,   293]])</pre></div>
+<p>Each row of the box is what really happened, and each column is what the model guessed. Both follow the order of your answers when sorted, which for Bank Marketing is <code>no</code> then <code>yes</code>. So the bottom row is the 1,587 clients who really said yes: the model guessed "no" for 1,294 of them and found 293. On your own data, read along the row of the answer you most want to catch.</p>
+<p>To get the same box as a picture, with the answers written on it:</p>
+<div class="codebox"><button class="copy">Copy</button><pre data-code="from sklearn.metrics import ConfusionMatrixDisplay
+
+ConfusionMatrixDisplay.from_predictions(y_test, guesses)"></pre></div>
+<div class="figbox small"><span class="olabel">Example output</span><img src="assets/evaluate_confusion.png" alt="A two-by-two confusion matrix for Bank Marketing. True label no: 11810 guessed no, 167 guessed yes. True label yes: 1294 guessed no, 293 guessed yes."></div>
+<p>If your target has more than two answers, the box has one row and one column for each. A large number away from the diagonal shows you which two answers the model mixes up.</p>
+</div></div></section>
+
+<section class="q" id="q-report"><button class="qhead" aria-expanded="false"><span class="title">How do I get precision, recall and F1?<small><code>classification_report</code> works these out for every answer in your target, in one table.</small></span><span class="chev">▾</span></button>
+<div class="qbody"><div class="qinner">
+<p>Precision, recall and F1 are all worked out from the counts in the confusion matrix. <code>classification_report</code> does the sums for us, using the guesses from the question above:</p>
+<div class="codebox"><button class="copy">Copy</button><pre data-code="from sklearn.metrics import classification_report
+
+print(classification_report(y_test, guesses))"></pre></div>
+<div class="outbox"><span class="olabel">Example output</span><pre class="o">              precision    recall  f1-score   support
+
+          no       0.90      0.99      0.94     11977
+         yes       0.64      0.18      0.29      1587
+
+    accuracy                           0.89     13564
+   macro avg       0.77      0.59      0.61     13564
+weighted avg       0.87      0.89      0.87     13564</pre></div>
+<p>There is one row for each answer, so read the row for the answer you most want to catch. In Bank Marketing that is <code>yes</code>. Precision 0.64 means that 64% of the model's "yes" guesses were right. Recall 0.18 means that it found 18% of the clients who really said yes. F1 combines the two, and it stays low unless both are high. <code>support</code> is the number of rows with that answer in the test set.</p>
+<p>The <code>accuracy</code> row is the score you get from <code>.score()</code>. <code>macro avg</code> is the plain average of the rows above it, so every answer counts equally, however rare it is.</p>
+<p>If you see <code>NameError: name 'guesses' is not defined</code>, run the first code block of the question above. In your report, say which of these numbers you are using to compare your models, and why that number suits your problem.</p>
+</div></div></section>
+
+<section class="q" id="q-curves"><button class="qhead" aria-expanded="false"><span class="title">How do I draw a ROC curve or a precision-recall curve?<small>Each curve shows, in one picture, every trade the model can make between its two kinds of mistake.</small></span><span class="chev">▾</span></button>
+<div class="qbody"><div class="qinner">
+<p>Most models work out a chance for each answer, and guess the second answer when its chance is above 0.5. A different cut-off gives different mistakes. These two curves draw the result for every possible cut-off, so they show how well the model separates the two answers overall. First, the ROC curve:</p>
+<div class="codebox"><button class="copy">Copy</button><pre data-code="from sklearn.metrics import RocCurveDisplay
+
+RocCurveDisplay.from_estimator({model}, X_test, y_test, plot_chance_level=True)"></pre></div>
+<div class="figbox small"><span class="olabel">Example output</span><img src="assets/evaluate_roc.png" alt="A ROC curve for logistic regression on Bank Marketing, rising above the dashed diagonal line, with an area under the curve of 0.77."></div>
+<p>Up the side is the share of the real "yes" rows that the model finds, which the plot calls the true positive rate (it is recall under another name). Along the bottom is the share of the real "no" rows that it wrongly calls "yes". A good model's curve climbs towards the top-left corner, and the dashed diagonal is a model that guesses at random. AUC in the legend is the area under the curve: 1.0 is a perfect model, and 0.5 is guessing.</p>
+<p>Next, the precision-recall curve, which is the more useful of the two when one answer is rare:</p>
+<div class="codebox"><button class="copy">Copy</button><pre data-code="from sklearn.metrics import PrecisionRecallDisplay
+
+PrecisionRecallDisplay.from_estimator({model}, X_test, y_test, plot_chance_level=True)"></pre></div>
+<div class="figbox small"><span class="olabel">Example output</span><img src="assets/evaluate_pr.png" alt="A precision-recall curve for logistic regression on Bank Marketing, falling from the top left towards a dashed line at 0.12, with an average precision of 0.42."></div>
+<p>Along the bottom is recall, and up the side is precision. Moving to the right, the model finds more of the "yes" rows, and more of its "yes" guesses turn out wrong. A good model's curve stays high for longer. The dashed line is a model that guesses at random, and AP in the legend is the area under the curve.</p>
+<p>To get the AUC as a number for your results table, we take the chance of the second answer for every row:</p>
+<div class="codebox"><button class="copy">Copy</button><pre data-code="from sklearn.metrics import roc_auc_score
+
+chances = {model}.predict_proba(X_test)[:, 1]
+print(round(roc_auc_score(y_test, chances), 3))"></pre></div>
+<div class="outbox"><span class="olabel">Example output</span><pre class="o">0.772</pre></div>
+<p>Both plots need a target with two answers. With more than two (Dry Bean and Steel Plates), they stop with <code>ValueError: Expected 'estimator' to be a binary classifier</code>. For those datasets, use the classification report, and this line for one AUC number across all the answers:</p>
+<div class="codebox"><button class="copy">Copy</button><pre data-code="print(round(roc_auc_score(y_test, {model}.predict_proba(X_test), multi_class='ovr'), 3))"></pre></div>
+<p>If your model is an <code>SVC</code>, <code>predict_proba</code> only works when you create the model with <code>SVC(probability=True)</code>.</p>
+</div></div></section>
+</div>
+
+<!-- ============================================================ 2 -->
+<div class="group" id="g-trust" hidden>
+<p class="gintro">A score comes from one particular test set, and a different set of rows would give a slightly different number. A model can also score well by memorising its training rows. The questions below check for both.</p>
+
+<section class="q" id="q-gap"><button class="qhead" aria-expanded="false"><span class="title">How do I check whether my model has memorised the training set?<small>A model that has memorised scores much higher on the rows it trained on than on rows it has not seen.</small></span><span class="chev">▾</span></button>
+<div class="qbody"><div class="qinner">
+<p>We score the model twice: first on the training set, and then on the test set.</p>
+<div class="extra"><span class="tag">Interactive</span> Type the name of your trained model <input data-key="model" value="model">, then run the code below.</div>
+<div class="codebox"><button class="copy">Copy</button><pre data-code="print(round({model}.score(X_train, y_train), 3))
+print(round({model}.score(X_test, y_test), 3))"></pre></div>
+<div class="outbox"><span class="olabel">Example output</span><pre class="o">0.893
+0.892</pre></div>
+<p>In Bank Marketing, logistic regression scores 0.893 on the training set and 0.892 on the test set. The two are close, so it has not memorised. A decision tree with no limit, on the same data, scores 1.0 and 0.835, and a gap of that size is the sign of memorising (overfitting).</p>
+<p>If you see a big gap, limit the model (for a tree, set <code>max_depth</code>) and score it again. In your report, give both numbers for each model.</p>
+</div></div></section>
+
+<section class="q" id="q-folds"><button class="qhead" aria-expanded="false"><span class="title">How do I check a score with folds?<small>Cross-validation gives every training row a turn at being tested, so the score does not depend on one lucky split.</small></span><span class="chev">▾</span></button>
+<div class="qbody"><div class="qinner">
+<p><code>cross_val_score</code> cuts the training set into five parts, called folds. It trains the model on four of them, scores it on the fifth, and repeats until every part has had a turn. We give it the training set only, so that the test set stays unseen until the end.</p>
+<div class="extra"><span class="tag">Interactive</span> Type the name of your model <input data-key="model" value="model">, then run the code below.</div>
+<div class="codebox"><button class="copy">Copy</button><pre data-code="from sklearn.model_selection import cross_val_score
+
+scores = cross_val_score({model}, X_train, y_train, cv=5)
+print(scores.round(3))"></pre></div>
+<div class="outbox"><span class="olabel">Example output</span><pre class="o">[0.888 0.893 0.892 0.896 0.891]</pre></div>
+<p>There are five scores, one for each turn. We report their average, and how far they spread (the standard deviation):</p>
+<div class="codebox"><button class="copy">Copy</button><pre data-code="print(scores.mean().round(3), scores.std().round(3))"></pre></div>
+<div class="outbox"><span class="olabel">Example output</span><pre class="o">0.892 0.003</pre></div>
+<p>In Bank Marketing, the average is 0.892 and the spread is 0.003, so the five turns agree closely. On a small dataset, your scores will spread further. If two models' averages are closer together than their spreads, the folds cannot tell you which one is better, so say that in your report.</p>
+<p>This trains the model five times, so it takes about five times as long as <code>fit</code>. If your model needs scaling, pass in the whole pipeline, as we did here, so that each turn works out its scaling from its own training rows.</p>
+</div></div></section>
+
+<section class="q" id="q-scoring"><button class="qhead" aria-expanded="false"><span class="title">How do I use a different score with folds?<small><code>cross_val_score</code> uses accuracy unless we name another score.</small></span><span class="chev">▾</span></button>
+<div class="qbody"><div class="qinner">
+<p>We name the score with <code>scoring</code>. <code>'f1_macro'</code> is the macro average F1 from the classification report. It works whatever your answers are called, and however many there are:</p>
+<div class="codebox"><button class="copy">Copy</button><pre data-code="scores = cross_val_score({model}, X_train, y_train, cv=5, scoring='f1_macro')
+print(scores.round(3))"></pre></div>
+<div class="outbox"><span class="olabel">Example output</span><pre class="o">[0.596 0.61  0.607 0.625 0.605]</pre></div>
+<p>Other names you can use are <code>'recall_macro'</code>, <code>'precision_macro'</code> and, for a target with two answers, <code>'roc_auc'</code>.</p>
+<p>If every score comes back as <code>nan</code>, the score you named needs to know which answer is the one of interest, and could not tell. <code>scoring='f1'</code> does this when your answers are words ("yes" and "no", or "good" and "bad"), because it only works when they are 0 and 1. Use <code>'f1_macro'</code> in its place.</p>
+</div></div></section>
+
+<section class="q" id="q-learning"><button class="qhead" aria-expanded="false"><span class="title">Would more data help my model?<small>A learning curve shows how the score changes as the model is given more rows to learn from.</small></span><span class="chev">▾</span></button>
+<div class="qbody"><div class="qinner">
+<p><code>LearningCurveDisplay</code> trains the model on a small part of the training set, then on bigger and bigger parts, and scores each one with folds. It trains the model many times, so give it a minute on a big table.</p>
+<div class="codebox"><button class="copy">Copy</button><pre data-code="from sklearn.model_selection import LearningCurveDisplay
+
+LearningCurveDisplay.from_estimator({model}, X_train, y_train, cv=5, score_type='both')"></pre></div>
+<div class="figbox small"><span class="olabel">Example output</span><img src="assets/evaluate_learning.png" alt="A learning curve for a decision tree with no limit on Bank Marketing. The Train line is flat at 1.0 and the Test line is flat near 0.83, at every number of training rows."></div>
+<p>Along the bottom is the number of rows the model was given. The "Train" line is its score on those rows, and the "Test" line is its score on the fold it did not see. This picture is a decision tree with no limit on Bank Marketing: the training line sits at 1.0, and the test line stays near 0.83 however many rows we add. A gap that never closes is memorising, and more rows will not fix it.</p>
+<p>On your own plot, look at the right-hand edge. If the two lines have come together and levelled off, more rows would add little. If the test line is still climbing, more data would probably help.</p>
+</div></div></section>
+</div>
+
+<!-- ============================================================ 3 -->
+<div class="group" id="g-improve" hidden>
+<p class="gintro">There are two things to try: changing which mistakes the model makes, so that it catches more of the answer you care about, and changing the model's settings. Whatever you try, write down what you changed and what happened to the numbers, even when the change is small.</p>
+
+<section class="q" id="q-weights"><button class="qhead" aria-expanded="false"><span class="title">How do I make my model catch more of the rare answer?<small><code>class_weight</code> tells the model that a mistake on the rare answer counts for more.</small></span><span class="chev">▾</span></button>
+<div class="qbody"><div class="qinner">
+<p>When one answer is much rarer than the other, a model can score well by mostly guessing the common one. <code>class_weight='balanced'</code> makes each mistake on the rare answer count for more while the model trains. We set it when we create the model, then train and check it as before:</p>
+<div class="codebox"><button class="copy">Copy</button><pre data-code="from sklearn.pipeline import make_pipeline
+from sklearn.preprocessing import MinMaxScaler
+from sklearn.linear_model import LogisticRegression
+
+weighted = make_pipeline(MinMaxScaler(), LogisticRegression(class_weight='balanced'))
+weighted.fit(X_train, y_train)
+
+print(classification_report(y_test, weighted.predict(X_test)))"></pre></div>
+<div class="outbox"><span class="olabel">Example output</span><pre class="o">              precision    recall  f1-score   support
+
+          no       0.94      0.77      0.85     11977
+         yes       0.27      0.64      0.38      1587
+
+    accuracy                           0.76     13564
+   macro avg       0.61      0.71      0.62     13564
+weighted avg       0.86      0.76      0.79     13564</pre></div>
+<p>In Bank Marketing, recall for <code>yes</code> rises from 0.18 to 0.64, so the model now finds most of the clients who said yes. Precision falls from 0.64 to 0.27, because it says "yes" far more often, and accuracy falls from 0.89 to 0.76. Whether that is a better model depends on which mistake costs more in your problem. Compare the two reports, then say which model you would use, and why.</p>
+<p><code>class_weight</code> works in <code>LogisticRegression</code>, <code>SVC</code>, <code>DecisionTreeClassifier</code> and <code>RandomForestClassifier</code>. <code>KNeighborsClassifier</code>, <code>GaussianNB</code> and <code>GradientBoostingClassifier</code> do not have it, and stop with <code>TypeError: got an unexpected keyword argument 'class_weight'</code>. For those models, use one of the next two questions.</p>
+</div></div></section>
+
+<section class="q" id="q-smote"><button class="qhead" aria-expanded="false"><span class="title">How do I balance my training set with SMOTE?<small>SMOTE adds made-up rows of the rare answer to the training set, until the answers are even.</small></span><span class="chev">▾</span></button>
+<div class="qbody"><div class="qinner">
+<p>SMOTE makes new rows of the rare answer, each one placed between two real rows that are close together. It comes from a separate library, so we install it first. Run this once, in its own cell, then restart the kernel (Kernel, then Restart):</p>
+<div class="codebox"><button class="copy">Copy</button><pre data-code="%pip install imbalanced-learn"></pre></div>
+<p>SMOTE must only ever see the training rows, so we put it inside a pipeline. This needs the pipeline from the new library. We give it its own name, so that it does not replace the <code>make_pipeline</code> you already have:</p>
+<div class="codebox"><button class="copy">Copy</button><pre data-code="from imblearn.pipeline import make_pipeline as make_smote_pipeline
+from imblearn.over_sampling import SMOTE
+
+smote_model = make_smote_pipeline(MinMaxScaler(), SMOTE(random_state=0), LogisticRegression())
+smote_model.fit(X_train, y_train)
+
+print(classification_report(y_test, smote_model.predict(X_test)))"></pre></div>
+<div class="outbox"><span class="olabel">Example output</span><pre class="o">              precision    recall  f1-score   support
+
+          no       0.94      0.76      0.84     11977
+         yes       0.26      0.65      0.37      1587
+
+    accuracy                           0.75     13564
+   macro avg       0.60      0.70      0.61     13564
+weighted avg       0.86      0.75      0.79     13564</pre></div>
+<p>In Bank Marketing, the result is close to <code>class_weight</code>: recall for <code>yes</code> is 0.65, and precision is 0.26. The test set is left as it was, so these scores are still for real clients.</p>
+<p>If you see <code>ModuleNotFoundError: No module named 'imblearn'</code>, the install has not finished, or the kernel has not been restarted since. SMOTE measures how close rows are, so scaling goes before it in the pipeline.</p>
+</div></div></section>
+
+<section class="q" id="q-cutoff"><button class="qhead" aria-expanded="false"><span class="title">How do I move the cut-off?<small>A model guesses the second answer when its chance is above 0.5, and we can choose a different line.</small></span><span class="chev">▾</span></button>
+<div class="qbody"><div class="qinner">
+<p><code>predict_proba</code> gives the chance of each answer for every row, with one column for each answer in <code>classes_</code>. We take the second column, which in Bank Marketing is the chance of <code>yes</code>:</p>
+<div class="codebox"><button class="copy">Copy</button><pre data-code="print({model}.classes_)
+
+chances = {model}.predict_proba(X_test)[:, 1]
+print(chances[:5].round(2))"></pre></div>
+<div class="outbox"><span class="olabel">Example output</span><pre class="o">['no' 'yes']
+[0.04 0.22 0.02 0.41 0.04]</pre></div>
+<p>With the usual cut-off of 0.5, all five of these clients are guessed "no". Next, we make our own guesses with a lower cut-off. <code>np.where</code> writes the first answer for every row at or above the cut-off, and the second answer for the rest.</p>
+<div class="extra"><span class="tag">Interactive</span> Type your cut-off <input data-key="cutoff" value="0.2">, then your two answers as <code>classes_</code> printed them: the second one <input data-key="pos" value="'yes'"> and the first one <input data-key="neg" value="'no'"> (in quotes if they are text). Then run the code below.</div>
+<div class="codebox"><button class="copy">Copy</button><pre data-code="new_guesses = np.where(chances >= {cutoff}, {pos}, {neg})
+
+print(classification_report(y_test, new_guesses))"></pre></div>
+<div class="outbox"><span class="olabel">Example output</span><pre class="o">              precision    recall  f1-score   support
+
+          no       0.93      0.93      0.93     11977
+         yes       0.47      0.45      0.46      1587
+
+    accuracy                           0.88     13564
+   macro avg       0.70      0.69      0.69     13564
+weighted avg       0.87      0.88      0.87     13564</pre></div>
+<p>In Bank Marketing, a cut-off of 0.2 lifts recall for <code>yes</code> from 0.18 to 0.45, and precision falls from 0.64 to 0.47. Try two or three cut-offs, and write down the report for each. In your report, say which cut-off you chose and what it cost. This only works for a target with two answers.</p>
+</div></div></section>
+
+<section class="q" id="q-grid"><button class="qhead" aria-expanded="false"><span class="title">How do I try several settings for my model?<small><code>GridSearchCV</code> trains the model once for every setting in a list, and scores each one with folds.</small></span><span class="chev">▾</span></button>
+<div class="qbody"><div class="qinner">
+<p>Every model has settings that we choose before it trains, like <code>max_depth</code> for a tree or <code>n_neighbors</code> for k-NN. These are called hyperparameters. We give <code>GridSearchCV</code> a model and a list of values to try. It scores every value with folds of the training set, so that the test set is not used to choose.</p>
+<div class="codebox"><button class="copy">Copy</button><pre data-code="from sklearn.model_selection import GridSearchCV
+from sklearn.tree import DecisionTreeClassifier
+
+settings = {'max_depth': [1, 3, 5, 10, None]}
+
+grid = GridSearchCV(DecisionTreeClassifier(random_state=0), settings, cv=5)
+grid.fit(X_train, y_train)
+
+print(grid.best_params_)
+print(round(grid.best_score_, 3))"></pre></div>
+<div class="outbox"><span class="olabel">Example output</span><pre class="o">{'max_depth': 1}
+0.893</pre></div>
+<p><code>best_params_</code> is the setting with the highest average across the folds, and <code>best_score_</code> is that average. To see every setting that was tried:</p>
+<div class="codebox"><button class="copy">Copy</button><pre data-code="pd.DataFrame(grid.cv_results_)[['param_max_depth', 'mean_test_score', 'std_test_score']].round(3)"></pre></div>
+<div class="outbox"><span class="olabel">Example output</span><pre class="o">  param_max_depth  mean_test_score  std_test_score
+0               1            0.893           0.002
+1               3            0.892           0.002
+2               5            0.892           0.002
+3              10            0.890           0.003
+4            None            0.829           0.001</pre></div>
+<p>In Bank Marketing, limits of 1, 3 and 5 are within 0.001 of each other, and no limit is far behind. After <code>fit</code>, <code>grid</code> is the model trained with the best setting, so we score it once on the test set:</p>
+<div class="codebox"><button class="copy">Copy</button><pre data-code="print(round(grid.score(X_test, y_test), 3))"></pre></div>
+<div class="outbox"><span class="olabel">Example output</span><pre class="o">0.893</pre></div>
+<p>To choose by a different score, add <code>scoring='f1_macro'</code> inside <code>GridSearchCV( )</code>. To try two settings at once, add a second line to <code>settings</code>. The grid tries every combination, so 4 values of one and 3 of the other is 12 combinations, each trained 5 times.</p>
+<p>If your model is a pipeline, each setting's name needs the step's name and two underscores in front, for example <code>{'kneighborsclassifier__n_neighbors': [3, 15, 25]}</code>. The step's name is the model's name in lower case. Without it, you will see <code>ValueError: Invalid parameter 'n_neighbors' for estimator Pipeline</code>.</p>
+<p>In your report, list the values you tried and the score for each one.</p>
+</div></div></section>
+
+<section class="q" id="q-which"><button class="qhead" aria-expanded="false"><span class="title">Which settings should I try for my model?<small>Each model has one or two settings that change its results the most.</small></span><span class="chev">▾</span></button>
+<div class="qbody"><div class="qinner">
+<p>Start with the settings below. Each card gives the name to use in <code>settings</code>, what it controls, and some values to try. The names with two underscores are for models inside a pipeline with a scaler.</p>
+<div class="dsgrid">
+<div class="dscard"><h3>k-NN</h3><p><code>'kneighborsclassifier__n_neighbors': [3, 5, 15, 25]</code> is how many neighbours vote. More neighbours give a steadier guess.</p></div>
+<div class="dscard"><h3>SVM</h3><p><code>'svc__C': [0.1, 1, 10]</code> is how hard it tries to get every training row on the right side. A larger value follows the training rows more closely.</p></div>
+<div class="dscard"><h3>Logistic regression</h3><p><code>'logisticregression__C': [0.01, 0.1, 1, 10]</code> is how large its weights are allowed to grow. A smaller value holds them back more.</p></div>
+<div class="dscard"><h3>Decision tree</h3><p><code>'max_depth': [3, 5, 10, None]</code> is how many questions deep it can go. <code>'min_samples_leaf': [1, 20, 100]</code> is the fewest rows allowed in a final box.</p></div>
+<div class="dscard"><h3>Random forest</h3><p><code>'n_estimators': [100, 300]</code> is the number of trees. <code>'max_depth': [5, 10, None]</code> limits each tree.</p></div>
+<div class="dscard"><h3>Gradient boosting</h3><p><code>'learning_rate': [0.05, 0.1, 0.2]</code> is the size of each tree's step. <code>'n_estimators': [100, 200]</code> is the number of trees.</p></div>
+<div class="dscard"><h3>Naive Bayes</h3><p><code>GaussianNB</code> has almost nothing to tune. If it is one of your models, say so in your report, and tune your other model.</p></div>
+</div>
+</div></div></section>
+
+<section class="q" id="q-random"><button class="qhead" aria-expanded="false"><span class="title">How do I search when there are too many combinations?<small><code>RandomizedSearchCV</code> tries a set number of random combinations from a range.</small></span><span class="chev">▾</span></button>
+<div class="qbody"><div class="qinner">
+<p>A grid tries every combination, so it grows quickly as you add settings. <code>RandomizedSearchCV</code> picks combinations at random from the ranges we give it, and we choose how many it tries with <code>n_iter</code>. <code>randint(1, 30)</code> means any whole number from 1 to 29.</p>
+<div class="codebox"><button class="copy">Copy</button><pre data-code="from sklearn.model_selection import RandomizedSearchCV
+from scipy.stats import randint
+
+ranges = {'max_depth': randint(1, 30), 'min_samples_leaf': randint(1, 200)}
+
+search = RandomizedSearchCV(DecisionTreeClassifier(random_state=0), ranges, n_iter=20, cv=5, random_state=0)
+search.fit(X_train, y_train)
+
+print(search.best_params_)
+print(round(search.best_score_, 3))"></pre></div>
+<div class="outbox"><span class="olabel">Example output</span><pre class="o">{'max_depth': 25, 'min_samples_leaf': 89}
+0.893</pre></div>
+<p>In Bank Marketing, 20 random combinations with 5 folds each is 100 models, and the best average is 0.893, the same as the grid found. <code>random_state=0</code> makes it pick the same combinations every time, so that you can report them.</p>
+</div></div></section>
+</div>
+
+</div>
+
+</main>
+<script>
+const vals = {df:'df', target:'target', model:'model', cutoff:'0.2', pos:"'yes'", neg:"'no'"};
+try{ Object.assign(vals, JSON.parse(localStorage.getItem('cw-names')||'{}')); }catch(e){}
+function sub(s){ return s.replace(/\{(\w+)\}/g, (m,k)=> vals[k] ?? m); }
+function esc(s){ return s.replace(/&/g,'&amp;').replace(/</g,'&lt;'); }
+function refresh(){ document.querySelectorAll('pre[data-code]').forEach(p=> p.innerHTML = esc(sub(p.dataset.code)));
+  document.getElementById('nm-df').textContent = vals.df; document.getElementById('nm-target').textContent = vals.target;
+  document.querySelectorAll('input[data-key]').forEach(i=>{ if(i.value!==vals[i.dataset.key]) i.value=vals[i.dataset.key]; }); }
+document.querySelectorAll('input[data-key]').forEach(i=> i.addEventListener('input', e=>{ vals[e.target.dataset.key]=e.target.value; try{localStorage.setItem('cw-names',JSON.stringify(vals));}catch(x){} refresh(); }));
+refresh();
+const nb=document.getElementById('namesbtn'), np=document.getElementById('namespanel');
+nb.addEventListener('click',()=>{ const open=np.hidden; np.hidden=!open; nb.setAttribute('aria-expanded',open); if(open) np.querySelector('input').focus(); });
+document.addEventListener('click',e=>{ if(!e.target.closest('.namesdock')){ np.hidden=true; nb.setAttribute('aria-expanded','false'); } });
+document.querySelectorAll('.copy').forEach(b=> b.addEventListener('click', ()=>{ const t = sub(b.parentElement.querySelector('pre').dataset.code); navigator.clipboard?.writeText(t).then(()=>{ b.textContent='Copied'; setTimeout(()=>b.textContent='Copy',1200); }); }));
+const qs=[...document.querySelectorAll('.q')];
+function setOpen(q, open){ q.classList.toggle('open', open); q.querySelector('.qhead').setAttribute('aria-expanded', open); }
+qs.forEach(q=> q.querySelector('.qhead').addEventListener('click', ()=>{
+  const opening = !q.classList.contains('open');
+  qs.forEach(o=>{ if(o!==q && o.classList.contains('open')) setOpen(o,false); });
+  setOpen(q, opening);
+  if(opening) setTimeout(()=> q.scrollIntoView({behavior:'smooth', block:'start'}), 60);
+}));
+let current = null;
+function pick(g, scroll){
+  if (g === current) g = null;
+  current = g;
+  document.querySelectorAll('.panel').forEach(x=>x.classList.toggle('on', x.dataset.group===g));
+  document.querySelectorAll('.group').forEach(x=>{ const on = g && x.id==='g-'+g; if(on && x.hidden){ x.hidden=false; x.classList.remove('show'); void x.offsetWidth; x.classList.add('show'); } else if(!on) x.hidden=true; });
+  if(g && scroll) document.getElementById('layout').scrollIntoView({behavior:'smooth',block:'start'});
+}
+document.querySelectorAll('.panel').forEach(a=>a.addEventListener('click',e=>{ e.preventDefault(); pick(a.dataset.group,true); }));
+if(location.hash){ const q=document.querySelector(location.hash); if(q && q.closest('.group')){ pick(q.closest('.group').id.slice(2),false); setOpen(q,true); q.scrollIntoView(); } }
+// review mode: every paragraph on this page is new wording, so ?review shades all of it
+if(/[?&]review\b/.test(location.search)){ document.body.classList.add('review');
+  document.querySelectorAll('.intro-text p, .gintro, .qinner > p, .qhead small, .panel p, .dscard p, .extra').forEach(e=> e.setAttribute('data-draft','')); }
+</script>
+</body></html>

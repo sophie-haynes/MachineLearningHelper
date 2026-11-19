@@ -1,0 +1,413 @@
+<!doctype html>
+<!--
+  Coursework Helper: Build models (stage 5), drafted 16 November 2026 for weeks 5 and 6.
+  Built on the design of this folder (style.css, and the same script as visualise.html).
+  Every paragraph on this page is new wording. Open the page with ?review on the end of the address to shade it.
+  The code is the code from the week 5 and week 6 labs. The three XGBoost questions are moved in from
+  generated/week6/coursework_helper_xgboost.html.
+  Example outputs were run on Bank Marketing, prepared as in the week 5 and week 6 labs, with scikit-learn 1.9.1,
+  pandas 3.1.1 and xgboost 3.4.1, by generated/week6/scripts/helper_build_outputs.py.
+-->
+<html lang="en-GB"><head><meta charset="utf-8"><meta name="viewport" content="width=device-width,initial-scale=1">
+<title>Build models · Coursework Helper</title>
+<link rel="stylesheet" href="https://fonts.googleapis.com/css2?family=Source+Sans+3:wght@400;600;700&family=Source+Code+Pro:wght@400;600&display=swap">
+<link rel="stylesheet" href="style.css">
+<style>
+  body.review [data-draft]{background:#FFF6D6;box-shadow:0 0 0 3px #FFF6D6;border-radius:3px}
+</style>
+</head><body>
+<div class="topbar"></div>
+<div class="masthead"><a class="brand" href="index.html">CM3151 / CMM548 · Coursework Helper</a><span class="crumbs">› Stage 5 · Build models · Weeks 5 and 6</span>
+<div class="namesdock"><button class="namesbtn" id="namesbtn" aria-expanded="false">Your names: <code id="nm-df">df</code> · <code id="nm-target">target</code> <span class="chev">▾</span></button>
+<div class="namespanel" id="namespanel" hidden><p>Type the names from your own notebook once. Every code block on the page changes to match, and they are remembered on this computer.</p>
+<label>Your table <input data-key="df" value="df"></label><label>Your target column <input data-key="target" value="target"></label></div></div></div>
+<main class="wrap">
+<h1>Build models</h1>
+<div class="intro-text"><p>In the last stage, we fixed the problems in our table. In this stage, we train models on it. First, we hold back part of the table, so that every model can be checked on rows it has never seen. Then we train models from four families, which differ in how they turn a row into a guess. Finally, we put their scores side by side. The code on this page starts from the table you finished in the Prepare stage.</p></div>
+
+<div class="model" id="model">
+  <a class="panel" href="#g-split" data-group="split">
+    <svg viewBox="0 0 200 120" fill="none" stroke="#682773" stroke-width="2" stroke-linecap="round">
+      <rect x="18" y="10" width="92" height="70" fill="#F4ECF6" stroke="none"/>
+      <rect x="18" y="80" width="92" height="30" fill="#F9EBDD" stroke="none"/>
+      <path d="M18 20h92M18 30h92M18 40h92M18 50h92M18 60h92M18 70h92M18 90h92M18 100h92M48 10v100M78 10v100" stroke="#D8CDDD" stroke-width="1"/>
+      <rect x="18" y="10" width="92" height="100" rx="4"/>
+      <path d="M18 80h92" stroke="#C9742C" stroke-width="2.2"/>
+      <text x="120" y="49" font-size="11" fill="#682773" stroke="none" font-family="Source Sans 3" font-weight="700">training set</text>
+      <text x="120" y="99" font-size="11" fill="#C9742C" stroke="none" font-family="Source Sans 3" font-weight="700">test set</text>
+    </svg>
+    <h2>Hold back a test set</h2><p>Separate the target, keep some rows unseen, and find the score to beat.</p>
+  </a>
+  <a class="panel" href="#g-distance" data-group="distance">
+    <svg viewBox="0 0 200 120" fill="none" stroke="#682773" stroke-width="2" stroke-linecap="round">
+      <path d="M16 106h170M16 106V12" stroke="#D8CDDD"/>
+      <g fill="#F9EBDD" stroke="#C9742C"><circle cx="78" cy="52" r="5"/><circle cx="40" cy="40" r="5"/><circle cx="50" cy="80" r="5"/><circle cx="30" cy="64" r="5"/><circle cx="64" cy="96" r="5"/></g>
+      <g fill="#682773"><circle cx="120" cy="48" r="5"/><circle cx="112" cy="78" r="5"/><circle cx="150" cy="38" r="5"/><circle cx="162" cy="70" r="5"/><circle cx="140" cy="92" r="5"/></g>
+      <circle cx="100" cy="62" r="29" stroke="#2E8B57" stroke-dasharray="4 5"/>
+      <circle cx="100" cy="62" r="7" fill="#fff" stroke="#2E8B57"/>
+      <text x="100" y="66" font-size="10" fill="#2E8B57" stroke="none" font-family="Source Sans 3" font-weight="700" text-anchor="middle">?</text>
+    </svg>
+    <h2>Distance-based models</h2><p>k-NN and SVM guess from the rows that sit closest.</p>
+  </a>
+  <a class="panel" href="#g-prob" data-group="prob">
+    <svg viewBox="0 0 200 120" fill="none" stroke="#682773" stroke-width="2" stroke-linecap="round">
+      <path d="M52 20v84" stroke="#D8CDDD"/>
+      <rect x="52" y="30" width="112" height="22" rx="3" fill="#F4ECF6"/>
+      <rect x="52" y="68" width="18" height="22" rx="3" fill="#F9EBDD" stroke="#C9742C"/>
+      <text x="44" y="45" font-size="11" fill="#682773" stroke="none" font-family="Source Sans 3" font-weight="700" text-anchor="end">yes</text>
+      <text x="44" y="83" font-size="11" fill="#C9742C" stroke="none" font-family="Source Sans 3" font-weight="700" text-anchor="end">no</text>
+      <text x="172" y="45" font-size="11" fill="#682773" stroke="none" font-family="Source Code Pro">0.86</text>
+      <text x="78" y="83" font-size="11" fill="#C9742C" stroke="none" font-family="Source Code Pro">0.14</text>
+    </svg>
+    <h2>Probabilistic models</h2><p>Naive Bayes and logistic regression work out a chance for each answer.</p>
+  </a>
+  <a class="panel" href="#g-tree" data-group="tree">
+    <svg viewBox="0 0 200 120" fill="none" stroke="#682773" stroke-width="2" stroke-linecap="round">
+      <path d="M100 38L54 78M100 38l46 40" stroke="#D8CDDD"/>
+      <rect x="58" y="12" width="84" height="26" rx="6" fill="#fff"/>
+      <text x="100" y="29" font-size="11" fill="#682773" stroke="none" font-family="Source Code Pro" text-anchor="middle">visits ≤ 2 ?</text>
+      <text x="62" y="58" font-size="10" fill="#6E6577" stroke="none" font-family="Source Sans 3" text-anchor="end">yes</text>
+      <text x="138" y="58" font-size="10" fill="#6E6577" stroke="none" font-family="Source Sans 3">no</text>
+      <rect x="14" y="78" width="80" height="26" rx="6" fill="#F9EBDD" stroke="#C9742C"/>
+      <rect x="106" y="78" width="80" height="26" rx="6" fill="#F4ECF6"/>
+      <text x="54" y="95" font-size="10.5" fill="#C9742C" stroke="none" font-family="Source Sans 3" font-weight="700" text-anchor="middle">did not renew</text>
+      <text x="146" y="95" font-size="10.5" fill="#682773" stroke="none" font-family="Source Sans 3" font-weight="700" text-anchor="middle">renewed</text>
+    </svg>
+    <h2>Tree-based models</h2><p>A decision tree asks one yes/no question after another.</p>
+  </a>
+  <a class="panel" href="#g-ensemble" data-group="ensemble">
+    <svg viewBox="0 0 200 120" fill="none" stroke="#682773" stroke-width="2" stroke-linecap="round">
+      <g id="mini"><path d="M40 16L26 40M40 16l14 24" stroke="#D8CDDD"/><circle cx="40" cy="16" r="6" fill="#fff"/><circle cx="26" cy="40" r="5" fill="#F4ECF6"/><circle cx="54" cy="40" r="5" fill="#F4ECF6"/></g>
+      <g transform="translate(60 0)"><path d="M40 16L26 40M40 16l14 24" stroke="#D8CDDD"/><circle cx="40" cy="16" r="6" fill="#fff"/><circle cx="26" cy="40" r="5" fill="#F4ECF6"/><circle cx="54" cy="40" r="5" fill="#F4ECF6"/></g>
+      <g transform="translate(120 0)"><path d="M40 16L26 40M40 16l14 24" stroke="#D8CDDD"/><circle cx="40" cy="16" r="6" fill="#fff"/><circle cx="26" cy="40" r="5" fill="#F4ECF6"/><circle cx="54" cy="40" r="5" fill="#F4ECF6"/></g>
+      <text x="40" y="64" font-size="11" fill="#682773" stroke="none" font-family="Source Sans 3" font-weight="700" text-anchor="middle">yes</text>
+      <text x="100" y="64" font-size="11" fill="#C9742C" stroke="none" font-family="Source Sans 3" font-weight="700" text-anchor="middle">no</text>
+      <text x="160" y="64" font-size="11" fill="#682773" stroke="none" font-family="Source Sans 3" font-weight="700" text-anchor="middle">yes</text>
+      <path d="M30 74h140" stroke="#D8CDDD"/>
+      <rect x="56" y="84" width="88" height="26" rx="6" fill="#EDF7F0" stroke="#2E8B57"/>
+      <text x="100" y="101" font-size="11" fill="#2E8B57" stroke="none" font-family="Source Sans 3" font-weight="700" text-anchor="middle">the vote: yes</text>
+    </svg>
+    <h2>Ensembles</h2><p>A random forest, gradient boosting and XGBoost combine many trees.</p>
+  </a>
+  <a class="panel" href="#g-compare" data-group="compare">
+    <svg viewBox="0 0 200 120" fill="none" stroke="#682773" stroke-width="2" stroke-linecap="round">
+      <path d="M26 12v84" stroke="#D8CDDD"/>
+      <rect x="26" y="20" width="118" height="16" rx="3" fill="#F4ECF6"/>
+      <rect x="26" y="46" width="96" height="16" rx="3" fill="#F4ECF6"/>
+      <rect x="26" y="72" width="132" height="16" rx="3" fill="#F4ECF6"/>
+      <path d="M134 10v90" stroke="#C9742C" stroke-dasharray="4 5"/>
+      <text x="134" y="114" font-size="10.5" fill="#C9742C" stroke="none" font-family="Source Sans 3" font-weight="700" text-anchor="middle">the score to beat</text>
+    </svg>
+    <h2>Compare your models</h2><p>Put every score side by side, next to the score to beat.</p>
+  </a>
+</div>
+
+<div id="layout">
+
+<!-- ============================================================ 1 -->
+<div class="group" id="g-split" hidden>
+<p class="gintro">A model that is checked on the same rows it learned from can score well by memorising them. So before we train anything, we hold some rows back, and we work out the score a model would get without learning anything at all.</p>
+
+<section class="q" id="q-xy"><button class="qhead" aria-expanded="false"><span class="title">How do I separate the target from the other columns?<small>A model learns from one set of columns and guesses another, so the two need to be apart.</small></span><span class="chev">▾</span></button>
+<div class="qbody"><div class="qinner">
+<p>The columns the model learns from are called <code>X</code>, and the answer it is learning to guess is called <code>y</code>. <code>drop</code> gives us every column except the target, and the square brackets pick out the target on its own:</p>
+<div class="codebox"><button class="copy">Copy</button><pre data-code="X = {df}.drop(columns=['{target}'])
+y = {df}['{target}']
+print(X.shape, y.shape)"></pre></div>
+<div class="outbox"><span class="olabel">Example output</span><pre class="o">(45211, 51) (45211,)</pre></div>
+<p>On Bank Marketing, <code>X</code> has 45,211 rows and 51 columns, and <code>y</code> has the same 45,211 rows. Check that your own two row counts match.</p>
+<p>If your table has a column that only labels each row (a name or an ID number), add it to the list inside <code>drop</code>, because a label says nothing about the answer. In the gym, that was <code>columns=['name', 'renewed']</code>.</p>
+<p>Every column left in <code>X</code> needs to be a number by now. If a later step stops with <code>ValueError: could not convert string to float</code>, a text column is still in <code>X</code>, and <a href="prepare.html#q-dummies">the Prepare stage shows how to turn it into numbers</a>.</p>
+</div></div></section>
+
+<section class="q" id="q-split"><button class="qhead" aria-expanded="false"><span class="title">How do I hold back a test set?<small>The test set is the rows the model never sees while it learns, so that we can check it fairly afterwards.</small></span><span class="chev">▾</span></button>
+<div class="qbody"><div class="qinner">
+<p><code>train_test_split</code> picks rows at random and puts them into two sets: a training set for the model to learn from, and a test set to check it with. There are three settings to know:</p>
+<ol class="steps-list">
+<li><code>test_size=0.3</code> holds back 30% of the rows as the test set.</li>
+<li><code>random_state=0</code> makes the computer pick the same rows every time, so that your scores do not change each time you run your notebook.</li>
+<li><code>stratify=y</code> keeps the same share of each answer in the training set and in the test set.</li>
+</ol>
+<div class="codebox"><button class="copy">Copy</button><pre data-code="from sklearn.model_selection import train_test_split
+
+X_train, X_test, y_train, y_test = train_test_split(X, y, test_size=0.3, random_state=0, stratify=y)
+print(X_train.shape, X_test.shape)"></pre></div>
+<div class="outbox"><span class="olabel">Example output</span><pre class="o">(31647, 51) (13564, 51)</pre></div>
+<p>Next, we check that both sets got their fair share of each answer:</p>
+<div class="codebox"><button class="copy">Copy</button><pre data-code="pd.DataFrame({
+    'training set': y_train.value_counts(normalize=True),
+    'test set': y_test.value_counts(normalize=True),
+}).round(3)"></pre></div>
+<div class="outbox"><span class="olabel">Example output</span><pre class="o">     training set  test set
+y
+no          0.883     0.883
+yes         0.117     0.117</pre></div>
+<p>On Bank Marketing, there are 31,647 clients in the training set and 13,564 in the test set, with 0.883 "no" and 0.117 "yes" in both. From here on, the test set is only used for checking a model, never for training one. Write down the size of your two sets, because a score means more when the reader knows how many rows it was worked out from.</p>
+</div></div></section>
+
+<section class="q" id="q-beat"><button class="qhead" aria-expanded="false"><span class="title">What score does a model have to beat?<small>Always guessing the most common answer gets a score without learning anything.</small></span><span class="chev">▾</span></button>
+<div class="qbody"><div class="qinner">
+<p>Before we train anything, we work out the score we would get by always guessing the most common answer. Any model needs to beat this number to be useful. <code>value_counts(normalize=True)</code> gives the share of each answer in the test set, and the largest share is the score to beat:</p>
+<div class="codebox"><button class="copy">Copy</button><pre data-code="y_test.value_counts(normalize=True).round(3)"></pre></div>
+<div class="outbox"><span class="olabel">Example output</span><pre class="o">y
+no     0.883
+yes    0.117
+Name: proportion, dtype: float64</pre></div>
+<p>On Bank Marketing, always guessing "no" would be right for 88.3% of the test set, so 0.883 is the score to beat. A model that scores 0.88 here sounds good, but it has done no better than guessing. Write down your own number, and keep it beside every score from here on.</p>
+</div></div></section>
+</div>
+
+<!-- ============================================================ 2 -->
+<div class="group" id="g-distance" hidden>
+<p class="gintro">A distance-based model treats every row as a point, and guesses from the points that sit closest to it. Because it measures distance, the column with the biggest numbers would decide which rows count as close. So every model in this family has <code>MinMaxScaler</code> in front of it.</p>
+
+<section class="q" id="q-knn"><button class="qhead" aria-expanded="false"><span class="title">How do I train k-NN?<small>k-NN finds the training rows most like a new row, and goes with the answer most of them have.</small></span><span class="chev">▾</span></button>
+<div class="qbody"><div class="qinner">
+<p>k-NN is short for "k nearest neighbours". For each new row, it finds the rows in the training set that sit closest to it, and guesses the answer that most of those neighbours have. <code>n_neighbors=3</code> asks the three closest rows.</p>
+<p>First, we join the scaler and the model together with <code>make_pipeline</code>, so that the smallest and largest values are worked out from the training set only. Then <code>fit</code> is the step where the model learns from the training set:</p>
+<div class="codebox"><button class="copy">Copy</button><pre data-code="from sklearn.pipeline import make_pipeline
+from sklearn.preprocessing import MinMaxScaler
+from sklearn.neighbors import KNeighborsClassifier
+
+knn = make_pipeline(MinMaxScaler(), KNeighborsClassifier(n_neighbors=3))
+knn.fit(X_train, y_train)"></pre></div>
+<p>Next, <code>score</code> asks the model to guess for every row we give it, and tells us the share of guesses that were right. We print two scores: the first is on the training set, which the model has seen, and the second is on the test set, which it has not.</p>
+<div class="codebox"><button class="copy">Copy</button><pre data-code="print(knn.score(X_train, y_train), knn.score(X_test, y_test))"></pre></div>
+<div class="outbox"><span class="olabel">Example output</span><pre class="o">0.9173381363162385 0.8805662046593925</pre></div>
+<p>On a big table this cell can take a minute or more, because k-NN compares every row it is scoring with every row in the training set.</p>
+<p>On Bank Marketing, k-NN scores 0.917 on the training set and 0.881 on the test set. The test score is the one to compare with the score to beat, and here it is just below it (0.883). Write down both of your numbers. <a href="evaluate.html#q-gap">The Evaluate stage shows how to read the gap between them</a>.</p>
+<p>To try a different number of neighbours, change the 3 and run both cells again. Write down the setting next to each pair of scores, so that you can report what you tried.</p>
+</div></div></section>
+
+<section class="q" id="q-svm"><button class="qhead" aria-expanded="false"><span class="title">How do I train an SVM?<small>An SVM draws a boundary between the answers, with as wide a gap as it can.</small></span><span class="chev">▾</span></button>
+<div class="qbody"><div class="qinner">
+<p>An SVM (support vector machine) draws a boundary between the rows of each answer, and places it so that the gap to the closest rows on either side is as wide as possible. A new row is guessed by the side of the boundary it falls on.</p>
+<p>It measures distances too, so it uses the same scaling step. The code is the same as for k-NN, with <code>SVC</code> (the scikit-learn name for an SVM) in place of <code>KNeighborsClassifier</code>:</p>
+<div class="codebox"><button class="copy">Copy</button><pre data-code="from sklearn.svm import SVC
+
+svm = make_pipeline(MinMaxScaler(), SVC())
+svm.fit(X_train, y_train)
+print(svm.score(X_train, y_train), svm.score(X_test, y_test))"></pre></div>
+<div class="outbox"><span class="olabel">Example output</span><pre class="o">0.8945239675166683 0.8942789737540549</pre></div>
+<p>An SVM gets slow as the table grows. If your training set has many more than 10,000 rows and this cell is still running after a few minutes, stop it and train on a random sample of 5,000 rows instead. <code>sample</code> picks rows at random, and we then pick out the answers for those same rows:</p>
+<div class="codebox"><button class="copy">Copy</button><pre data-code="X_sample = X_train.sample(n=5000, random_state=0)
+y_sample = y_train.loc[X_sample.index]
+
+svm = make_pipeline(MinMaxScaler(), SVC())
+svm.fit(X_sample, y_sample)
+print(svm.score(X_sample, y_sample), svm.score(X_test, y_test))"></pre></div>
+<div class="outbox"><span class="olabel">Example output</span><pre class="o">0.8886 0.8936891772338543</pre></div>
+<p>The model learns from the sample, but we still score it on the whole test set, the same test set as every other model. On Bank Marketing, the sample gives a test score of 0.894, the same to three decimal places as training on all 31,647 clients. If you train on a sample for your coursework, say so in your report, and give the reason (for example, how long the full table took).</p>
+</div></div></section>
+</div>
+
+<!-- ============================================================ 3 -->
+<div class="group" id="g-prob" hidden>
+<p class="gintro">A probabilistic model works out a chance for each answer, and guesses the answer with the highest chance. The two models in this family get to that chance in different ways, and only one of them needs the columns on the same scale.</p>
+
+<section class="q" id="q-nb"><button class="qhead" aria-expanded="false"><span class="title">How do I train Naive Bayes?<small>Naive Bayes looks at one column at a time, and asks how common the row's value is for each answer.</small></span><span class="chev">▾</span></button>
+<div class="qbody"><div class="qinner">
+<p>For each answer, Naive Bayes asks how common each of the row's values is among the training rows with that answer, and multiplies those shares together. It is called "naive" because it treats every column as if it had nothing to do with the others. <code>GaussianNB</code> is the version that works with number columns.</p>
+<p>It looks at one column at a time, so a column with big numbers cannot drown out the others, and it needs no scaling step:</p>
+<div class="codebox"><button class="copy">Copy</button><pre data-code="from sklearn.naive_bayes import GaussianNB
+
+nb = GaussianNB()
+nb.fit(X_train, y_train)
+print(nb.score(X_train, y_train), nb.score(X_test, y_test))"></pre></div>
+<div class="outbox"><span class="olabel">Example output</span><pre class="o">0.8257338768287673 0.826673547626069</pre></div>
+<p>On Bank Marketing, Naive Bayes scores 0.826 on the training set and 0.827 on the test set, which is below the score to beat (0.883). Do not throw a model away for this alone! The score only counts how many guesses were right, not which ones, and <a href="evaluate.html#q-matrix">the Evaluate stage shows how to see which mistakes a model makes</a>.</p>
+<p>When you leave scaling out for a model, say why in your report.</p>
+</div></div></section>
+
+<section class="q" id="q-lr"><button class="qhead" aria-expanded="false"><span class="title">How do I train logistic regression?<small>Logistic regression gives every column a weight, and adds the weighted values up into a chance.</small></span><span class="chev">▾</span></button>
+<div class="qbody"><div class="qinner">
+<p>Logistic regression learns one weight for each column. For a new row, it multiplies each value by its column's weight, adds the results together, and turns the total into a chance between 0 and 1.</p>
+<p>It finds its weights more easily when the columns are on the same scale, so it goes in a pipeline with the scaler, like the distance-based models:</p>
+<div class="codebox"><button class="copy">Copy</button><pre data-code="from sklearn.linear_model import LogisticRegression
+
+lr = make_pipeline(MinMaxScaler(), LogisticRegression())
+lr.fit(X_train, y_train)
+print(lr.score(X_train, y_train), lr.score(X_test, y_test))"></pre></div>
+<div class="outbox"><span class="olabel">Example output</span><pre class="o">0.8928808417859513 0.892288410498378</pre></div>
+<p>On Bank Marketing, logistic regression scores 0.893 on the training set and 0.892 on the test set, a little above the score to beat (0.883).</p>
+<p>If you see a warning that it "failed to converge", add <code>max_iter=1000</code> inside <code>LogisticRegression()</code>, which gives it more steps to find its weights. On Bank Marketing, this warning appears when the scaler is left out, so check that your model is inside the pipeline first.</p>
+</div></div></section>
+</div>
+
+<!-- ============================================================ 4 -->
+<div class="group" id="g-tree" hidden>
+<p class="gintro">A tree-based model asks a series of yes/no questions about a row, such as "is <code>visits</code> 2 or fewer?". Each answer leads to the next question, until the row reaches a guess. Every question looks at one column on its own, so a tree needs no scaling.</p>
+
+<section class="q" id="q-tree"><button class="qhead" aria-expanded="false"><span class="title">How do I train a decision tree?<small>A decision tree learns which yes/no questions split the training rows best.</small></span><span class="chev">▾</span></button>
+<div class="qbody"><div class="qinner">
+<p>A decision tree picks the question that best separates the answers in the training set, then picks another question for each side, and keeps going. <code>random_state=0</code> makes it settle ties between questions the same way every time, so that your scores do not change between runs.</p>
+<div class="codebox"><button class="copy">Copy</button><pre data-code="from sklearn.tree import DecisionTreeClassifier
+
+tree = DecisionTreeClassifier(random_state=0)
+tree.fit(X_train, y_train)
+print(tree.score(X_train, y_train), tree.score(X_test, y_test))"></pre></div>
+<div class="outbox"><span class="olabel">Example output</span><pre class="o">1.0 0.8347095252138013</pre></div>
+<p>On Bank Marketing, the tree scores 1.0 on the training set and 0.835 on the test set, which is worse than always guessing "no" (0.883). With no limit, a tree keeps asking questions until it has every training row right. It has memorised the training set, and what it memorised does not carry over to rows it has not seen.</p>
+<p>To see how far it went, ask the tree how many questions deep it is:</p>
+<div class="codebox"><button class="copy">Copy</button><pre data-code="tree.get_depth()"></pre></div>
+<div class="outbox"><span class="olabel">Example output</span><pre class="o">47</pre></div>
+<p>A perfect training score next to a much lower test score is the sign to look for in your own tree. The next question shows the fix.</p>
+</div></div></section>
+
+<section class="q" id="q-depth"><button class="qhead" aria-expanded="false"><span class="title">How do I stop my tree from memorising?<small><code>max_depth</code> limits how many questions deep the tree can go.</small></span><span class="chev">▾</span></button>
+<div class="qbody"><div class="qinner">
+<p>A tree that can only ask a few questions has to spend them on the patterns that hold for many rows, so it cannot memorise single rows. <code>max_depth=5</code> stops the tree after five questions. We give this tree its own name, so that both trees can be compared later:</p>
+<div class="codebox"><button class="copy">Copy</button><pre data-code="tree5 = DecisionTreeClassifier(max_depth=5, random_state=0)
+tree5.fit(X_train, y_train)
+print(tree5.score(X_train, y_train), tree5.score(X_test, y_test))"></pre></div>
+<div class="outbox"><span class="olabel">Example output</span><pre class="o">0.8957563118147059 0.8908139191978768</pre></div>
+<p>On Bank Marketing, the training score drops from 1.0 to 0.896 and the test score rises from 0.835 to 0.891. The two scores now sit close together, and the test score is above the score to beat.</p>
+<p>The best limit is different for every dataset, so try a few on your own (the lab used 1, 3, 5 and 10). Write down both scores for each limit, because the limit you choose needs its reason in your report. <a href="evaluate.html#q-grid">The Evaluate stage shows how to try several settings in one go</a>.</p>
+</div></div></section>
+</div>
+
+<!-- ============================================================ 5 -->
+<div class="group" id="g-ensemble" hidden>
+<p class="gintro">An ensemble combines many small models into one. The three ensembles on this page are all built from decision trees, so none of them needs scaling. They differ in how the trees are grown, and in how their guesses are combined.</p>
+
+<section class="q" id="q-rf"><button class="qhead" aria-expanded="false"><span class="title">How do I train a random forest?<small>A random forest grows many trees, each on a different random sample of the rows, and lets them vote.</small></span><span class="chev">▾</span></button>
+<div class="qbody"><div class="qinner">
+<p>A random forest grows 100 trees. Each tree is given a different random sample of the training rows, so the trees learn slightly different questions and make different mistakes. For a new row, every tree makes a guess, and the forest goes with the answer that gets the most votes. <code>random_state=0</code> makes the random samples the same every time.</p>
+<div class="codebox"><button class="copy">Copy</button><pre data-code="from sklearn.ensemble import RandomForestClassifier
+
+rf = RandomForestClassifier(random_state=0)
+rf.fit(X_train, y_train)
+print(rf.score(X_train, y_train), rf.score(X_test, y_test))"></pre></div>
+<div class="outbox"><span class="olabel">Example output</span><pre class="o">0.9998104085695326 0.8935417281038042</pre></div>
+<p>On Bank Marketing, the forest scores almost 1.0 on the training set, like the single tree with no limit, because each of its trees has no limit either. Its test score is 0.894 where the single tree scored 0.835: one tree's mistakes are outvoted by the others. Write down both numbers, and compare the test score with your score to beat.</p>
+</div></div></section>
+
+<section class="q" id="q-gb"><button class="qhead" aria-expanded="false"><span class="title">How do I train gradient boosting?<small>Gradient boosting grows small trees one after another, and each new tree works on what the trees so far still get wrong.</small></span><span class="chev">▾</span></button>
+<div class="qbody"><div class="qinner">
+<p>A random forest grows its trees separately and lets them vote. Gradient boosting grows them in a row: the first small tree makes its guesses, the second tree is trained on what the first still gets wrong, and so on for 100 trees. The final guess adds all of the trees together.</p>
+<div class="codebox"><button class="copy">Copy</button><pre data-code="from sklearn.ensemble import GradientBoostingClassifier
+
+gb = GradientBoostingClassifier(random_state=0)
+gb.fit(X_train, y_train)
+print(gb.score(X_train, y_train), gb.score(X_test, y_test))"></pre></div>
+<div class="outbox"><span class="olabel">Example output</span><pre class="o">0.898821373273928 0.893320554408729</pre></div>
+<p>On Bank Marketing, gradient boosting scores 0.899 on the training set and 0.893 on the test set. Its trees are small, so the two scores sit close together.</p>
+<p>On a big table this can take a few minutes. If it does, write down how long it took, so that you can give it as a reason in your report.</p>
+</div></div></section>
+
+<section class="q" id="q-xgb-install"><button class="qhead" aria-expanded="false"><span class="title">How do I install XGBoost?<small>XGBoost is a separate library, so Python cannot find it until it is installed.</small></span><span class="chev">▾</span></button>
+<div class="qbody"><div class="qinner">
+<p>XGBoost is a boosting model: it grows trees one after another, and each new tree works on what the trees so far still get wrong. It often comes near the top when papers compare models on tables of data, so you may meet it in your literature review. It does not come with scikit-learn, so it needs installing first.</p>
+<p>First, we install it from inside the notebook. The <code>%</code> at the start tells Jupyter to install the library into the same Python that runs your notebook. Run this once, in its own cell:</p>
+<div class="codebox"><button class="copy">Copy</button><pre data-code="%pip install xgboost"></pre></div>
+<p>When it finishes, restart the kernel (Kernel, then Restart), so that the notebook can see the new library. Then add the import line to the top of your notebook, with your other imports:</p>
+<div class="codebox"><button class="copy">Copy</button><pre data-code="from xgboost import XGBClassifier"></pre></div>
+<p>If you see <code>ModuleNotFoundError: No module named 'xgboost'</code>, the install has not finished, or the kernel has not been restarted since.</p>
+<p><strong>On a Mac:</strong> if you see <code>XGBoostError</code> with the words <code>libomp.dylib</code> and "could not be loaded", XGBoost needs one extra tool, OpenMP, which lets it use every core of your computer. Install it in the Terminal app with <code>brew install libomp</code> (this needs Homebrew), then restart the kernel. If you cannot install it, use Google Colab, where XGBoost is already installed.</p>
+</div></div></section>
+
+<section class="q" id="q-xgb-classes"><button class="qhead" aria-expanded="false"><span class="title">Why does XGBoost say my classes are invalid?<small>XGBoost needs each answer as a number: 0, 1, 2 and so on.</small></span><span class="chev">▾</span></button>
+<div class="qbody"><div class="qinner">
+<p>The scikit-learn models on this page accept answers written as words, like "yes" and "no". XGBoost does not. If your target column holds words, <code>fit</code> stops with an error like this one:</p>
+<div class="outbox"><span class="olabel">The error</span><pre class="o">ValueError: Invalid classes inferred from unique values of `y`.  Expected: [0 1], got ['no' 'yes']</pre></div>
+<p>So we turn each answer into a number with <code>LabelEncoder</code>. <code>fit_transform</code> learns the answers from the training set and turns them into numbers. Then <code>transform</code> turns the test set's answers into numbers in the same way, so that both sets use the same code:</p>
+<div class="codebox"><button class="copy">Copy</button><pre data-code="from sklearn.preprocessing import LabelEncoder
+
+le = LabelEncoder()
+y_train_num = le.fit_transform(y_train)
+y_test_num = le.transform(y_test)
+le.classes_"></pre></div>
+<div class="outbox"><span class="olabel">Example output</span><pre class="o">array(['no', 'yes'], dtype=object)</pre></div>
+<p><code>classes_</code> is the key: the first answer became 0 and the second became 1. Write it down, because you need it to read XGBoost's guesses. This also works when your target has more than two answers: they become 0, 1, 2 and so on. If your target is already 0 and 1, you can skip this step.</p>
+</div></div></section>
+
+<section class="q" id="q-xgb-train"><button class="qhead" aria-expanded="false"><span class="title">How do I train XGBoost and check it?<small>The same <code>fit</code> and <code>score</code> steps as every other model, using the numbered answers.</small></span><span class="chev">▾</span></button>
+<div class="qbody"><div class="qinner">
+<p>XGBoost is made of trees, so it does not need the columns on the same scale, just like the random forest. We train it on the numbered answers, and print both scores, as for every other model:</p>
+<div class="codebox"><button class="copy">Copy</button><pre data-code="xgb = XGBClassifier(random_state=0)
+xgb.fit(X_train, y_train_num)
+print(xgb.score(X_train, y_train_num), xgb.score(X_test, y_test_num))"></pre></div>
+<div class="outbox"><span class="olabel">Example output</span><pre class="o">0.9289664107182355 0.8941315246240047</pre></div>
+<p>XGBoost's guesses come back as numbers too. <code>inverse_transform</code> turns them back into your answers, so that you can read them:</p>
+<div class="codebox"><button class="copy">Copy</button><pre data-code="le.inverse_transform(xgb.predict(X_test[:5]))"></pre></div>
+<div class="outbox"><span class="olabel">Example output</span><pre class="o">array(['no', 'no', 'no', 'no', 'no'], dtype=object)</pre></div>
+<p>When you compare XGBoost with your other models, make sure every model is scored on the same test set. The numbered answers are the same rows as before, only written as numbers.</p>
+</div></div></section>
+</div>
+
+<!-- ============================================================ 6 -->
+<div class="group" id="g-compare" hidden>
+<p class="gintro">One score on its own says very little. Putting every model's scores in one table, next to the score to beat, shows which models have learned something, and gives you the comparison your report needs.</p>
+
+<section class="q" id="q-compare"><button class="qhead" aria-expanded="false"><span class="title">How do I put my models' scores side by side?<small>One table, with a row for each model and a column for each of its two scores.</small></span><span class="chev">▾</span></button>
+<div class="qbody"><div class="qinner">
+<p>We build a small table with one row for each model. The three lists need to be in the same order: the names you want to show, then each model's training score, then each model's test score. <code>round(3)</code> keeps three decimal places.</p>
+<div class="codebox"><button class="copy">Copy</button><pre data-code="pd.DataFrame({
+    'model': ['k-NN', 'Naive Bayes', 'Decision tree'],
+    'training score': [knn.score(X_train, y_train), nb.score(X_train, y_train), tree5.score(X_train, y_train)],
+    'test score': [knn.score(X_test, y_test), nb.score(X_test, y_test), tree5.score(X_test, y_test)],
+}).round(3)"></pre></div>
+<div class="outbox"><span class="olabel">Example output</span><pre class="o">           model  training score  test score
+0           k-NN           0.917       0.881
+1    Naive Bayes           0.826       0.827
+2  Decision tree           0.896       0.891</pre></div>
+<p>Swap in the models you trained: change the names in the first list, and the model at the start of each <code>.score</code> in the other two. If a model was trained on a sample, its training score uses the sample, as in <code>svm.score(X_sample, y_sample)</code>.</p>
+<p>Read the table in two steps. First, compare each test score with your score to beat. Then compare the two scores in each row: a training score far above the test score means that the model has memorised some of its training rows.</p>
+<p>On Bank Marketing, only the tree is above the score to beat (0.883), and even the best model on this page (0.894) is only about one point above it. When most of the answers are the same, this score cannot tell good models apart, and <a href="evaluate.html">the Evaluate stage shows the scores that can</a>. It asks for the name of a trained model, which is the name on the left of the <code>=</code> sign, such as <code>knn</code> or <code>tree5</code>.</p>
+</div></div></section>
+
+<section class="q" id="q-choose"><button class="qhead" aria-expanded="false"><span class="title">Which models should I compare?<small>Models from different families get to their guesses in different ways, so they make different mistakes.</small></span><span class="chev">▾</span></button>
+<div class="qbody"><div class="qinner">
+<p>Two models from the same family often get the same rows wrong, so comparing them tells you less than comparing across families. Each card below gives a family, its models on this page, and what to know before you choose it.</p>
+<div class="dsgrid">
+<div class="dscard"><h3>Distance-based</h3><p><code>knn</code> and <code>svm</code>. Both need the columns on the same scale. Both slow down on big tables: k-NN when it guesses, and the SVM when it trains.</p></div>
+<div class="dscard"><h3>Probabilistic</h3><p><code>nb</code> and <code>lr</code>. Naive Bayes needs no scaling, and logistic regression does. Both train quickly, and both can give a chance for each answer as well as a guess.</p></div>
+<div class="dscard"><h3>Tree-based</h3><p><code>tree</code> and <code>tree5</code>. No scaling needed. A tree memorises its training set unless it has a limit such as <code>max_depth</code>.</p></div>
+<div class="dscard"><h3>Ensembles</h3><p><code>rf</code>, <code>gb</code> and <code>xgb</code>. No scaling needed. They take longer to train, because each one is made of many trees.</p></div>
+</div>
+<p>A decision tree and a random forest are closely related, because a forest is made of trees. Comparing those two tells you less than comparing either of them with a model from another family.</p>
+<p>In your report, say why you chose each model, and for each fix from the Prepare stage, say whether your models needed it. A fix you left out, with its reason, is a result too.</p>
+</div></div></section>
+</div>
+
+</div>
+
+</main>
+
+<script>
+const vals = {df:'df', target:'target'};
+try{ Object.assign(vals, JSON.parse(localStorage.getItem('cw-names')||'{}')); }catch(e){}
+function sub(s){ return s.replace(/\{(\w+)\}/g, (m,k)=> vals[k] ?? m); }
+function esc(s){ return s.replace(/&/g,'&amp;').replace(/</g,'&lt;'); }
+function refresh(){ document.querySelectorAll('pre[data-code]').forEach(p=> p.innerHTML = esc(sub(p.dataset.code)));
+  document.getElementById('nm-df').textContent = vals.df; document.getElementById('nm-target').textContent = vals.target;
+  document.querySelectorAll('input[data-key]').forEach(i=>{ if(i.value!==vals[i.dataset.key]) i.value=vals[i.dataset.key]; }); }
+document.querySelectorAll('input[data-key]').forEach(i=> i.addEventListener('input', e=>{ vals[e.target.dataset.key]=e.target.value; try{localStorage.setItem('cw-names',JSON.stringify(vals));}catch(x){} refresh(); }));
+refresh();
+const nb=document.getElementById('namesbtn'), np=document.getElementById('namespanel');
+nb.addEventListener('click',()=>{ const open=np.hidden; np.hidden=!open; nb.setAttribute('aria-expanded',open); if(open) np.querySelector('input').focus(); });
+document.addEventListener('click',e=>{ if(!e.target.closest('.namesdock')){ np.hidden=true; nb.setAttribute('aria-expanded','false'); } });
+document.querySelectorAll('.copy').forEach(b=> b.addEventListener('click', ()=>{ const t = sub(b.parentElement.querySelector('pre').dataset.code); navigator.clipboard?.writeText(t).then(()=>{ b.textContent='Copied'; setTimeout(()=>b.textContent='Copy',1200); }); }));
+const qs=[...document.querySelectorAll('.q')];
+function setOpen(q, open){ q.classList.toggle('open', open); q.querySelector('.qhead').setAttribute('aria-expanded', open); }
+qs.forEach(q=> q.querySelector('.qhead').addEventListener('click', ()=>{
+  const opening = !q.classList.contains('open');
+  qs.forEach(o=>{ if(o!==q && o.classList.contains('open')) setOpen(o,false); });
+  setOpen(q, opening);
+  if(opening) setTimeout(()=> q.scrollIntoView({behavior:'smooth', block:'start'}), 60);
+}));
+let current = null;
+function pick(g, scroll){
+  if (g === current) g = null;
+  current = g;
+  document.querySelectorAll('.panel').forEach(x=>x.classList.toggle('on', x.dataset.group===g));
+  document.querySelectorAll('.group').forEach(x=>{ const on = g && x.id==='g-'+g; if(on && x.hidden){ x.hidden=false; x.classList.remove('show'); void x.offsetWidth; x.classList.add('show'); } else if(!on) x.hidden=true; });
+  if(g && scroll) document.getElementById('layout').scrollIntoView({behavior:'smooth',block:'start'});
+}
+document.querySelectorAll('.panel').forEach(a=>a.addEventListener('click',e=>{ e.preventDefault(); pick(a.dataset.group,true); }));
+if(location.hash){ const q=document.querySelector(location.hash); if(q && q.classList.contains('q')){ if(q.closest('.group')) pick(q.closest('.group').id.slice(2),false); setOpen(q,true); q.scrollIntoView(); } }
+// review mode: every paragraph on this page is new wording, so ?review shades all of it
+if(/[?&]review\b/.test(location.search)){ document.body.classList.add('review');
+  document.querySelectorAll('.intro-text p, .gintro, .qinner > p, .qinner li, .qhead small, .qhead .title, .panel h2, .panel p, .dscard p').forEach(e=> e.setAttribute('data-draft','')); }
+</script>
+</body></html>

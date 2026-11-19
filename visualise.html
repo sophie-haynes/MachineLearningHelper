@@ -1,0 +1,432 @@
+<!doctype html>
+<!--
+  Coursework Helper: Visualise (stage 3). Restructured 19 November 2026 so that each panel has one question for each type of column.
+  The five questions from 12 November keep their text (number column, target, number against target, text against target, heatmap).
+  Later on 19 November the two number questions in each panel were merged into one that opens with a nunique() check and three cards,
+  and the question on numbers that are really labels moved into the text column question.
+  New questions carry data-new, and new wording elsewhere carries data-draft. Open the page with ?review on the end of the address to shade both.
+  The new example outputs come from generated/week3/scripts/helper_visualise_outputs.py. The page before this change is
+  generated/coursework_helper_backups/visualise_before_19nov.html.
+-->
+<html lang="en-GB"><head><meta charset="utf-8"><meta name="viewport" content="width=device-width,initial-scale=1">
+<title>Visualise · Coursework Helper</title>
+<link rel="stylesheet" href="https://fonts.googleapis.com/css2?family=Source+Sans+3:wght@400;600;700&family=Source+Code+Pro:wght@400;600&display=swap">
+<link rel="stylesheet" href="style.css">
+<style>
+  body.review [data-draft]{background:#FFF6D6;box-shadow:0 0 0 3px #FFF6D6;border-radius:3px}
+  .typecards{display:grid;grid-template-columns:repeat(3,1fr);gap:.8rem;margin:.7rem 0 1rem}
+  .typecards .dscard{padding:.8rem .9rem}
+  .typecards .dscard p{max-width:none;margin:.35rem 0 0;font-size:.93rem;line-height:1.4}
+  .typecards .tvals{background:var(--purple-soft);border-radius:8px;padding:.4rem .6rem;font-family:var(--mono);font-size:.84rem;color:var(--purple-dark)}
+  .typecards .tvals code{background:none;padding:0;font-weight:600}
+  .branchhead{font-size:1.12rem!important;font-weight:700;color:var(--purple-dark);border-top:1.5px solid var(--line);margin-top:1.6rem!important;padding-top:1rem;max-width:none!important;scroll-margin-top:.8rem}
+  .figpair{display:grid;grid-template-columns:1fr 1fr;gap:1rem;margin:.9rem 0 .5rem}
+  .figpair .figbox{max-width:none;margin:0}
+  @media (max-width:760px){.typecards,.figpair{grid-template-columns:1fr}}
+</style>
+</head><body>
+<div class="topbar"></div>
+<div class="masthead"><a class="brand" href="index.html">CM3151 / CMM548 · Coursework Helper</a><span class="crumbs">› Stage 3 · Visualise · Week 3</span>
+<div class="namesdock"><button class="namesbtn" id="namesbtn" aria-expanded="false">Your names: <code id="nm-df">df</code> · <code id="nm-target">target</code> <span class="chev">▾</span></button>
+<div class="namespanel" id="namespanel" hidden><p>Type the names from your own notebook once. Every code block on the page changes to match, and they are remembered on this computer.</p>
+<label>Your table <input data-key="df" value="df"></label><label>Your target column <input data-key="target" value="target"></label></div></div></div>
+<main class="wrap">
+<h1>Visualise</h1>
+<div class="intro-text"><p>A chart in your report is there to show the reader something they need to see before a decision makes sense. In this stage, we pick the right chart for each job: one column on its own, one column against the target, and columns against each other. <span data-draft>The right chart depends on the type of column, so the first two panels have one question for each type.</span></p></div>
+
+<div class="model" id="model">
+  <a class="panel" href="#g-one" data-group="one">
+    <svg viewBox="0 0 200 120" fill="none" stroke="#682773" stroke-width="2" stroke-linecap="round">
+      <path d="M18 100h164" stroke="#D8CDDD"/>
+      <rect x="26" y="40" width="22" height="60" rx="2" fill="#F4ECF6"/><rect x="56" y="62" width="22" height="38" rx="2" fill="#fff" stroke="#C9742C"/>
+      <rect x="104" y="70" width="12" height="30" fill="#F4ECF6"/><rect x="116" y="46" width="12" height="54" fill="#F4ECF6"/><rect x="128" y="30" width="12" height="70" fill="#F4ECF6"/><rect x="140" y="56" width="12" height="44" fill="#F4ECF6"/><rect x="152" y="78" width="12" height="22" fill="#F4ECF6"/><rect x="164" y="90" width="12" height="10" fill="#F4ECF6"/>
+      <text x="22" y="114" font-size="10" fill="#682773" stroke="none" font-family="Source Sans 3" font-weight="700">target</text>
+      <text x="104" y="114" font-size="10" fill="#682773" stroke="none" font-family="Source Sans 3" font-weight="700">a number column</text>
+    </svg>
+    <h2>Single columns</h2><p>How to see the distribution and shape of a single column.</p>
+  </a>
+  <a class="panel" href="#g-against" data-group="against">
+    <svg viewBox="0 0 200 120" fill="none" stroke="#682773" stroke-width="2" stroke-linecap="round">
+      <path d="M18 100h164" stroke="#D8CDDD"/>
+      <path d="M26 100V70h14V44h14V36h14V58h14V84h14v16" fill="#FBEFE3" stroke="#C9742C"/>
+      <path d="M82 100V80h14V52h14V34h14V48h14V72h14v28" fill="#F4ECF6" fill-opacity=".8"/>
+      <text x="40" y="114" font-size="10" fill="#C9742C" stroke="none" font-family="Source Sans 3" font-weight="700">no</text>
+      <text x="124" y="114" font-size="10" fill="#682773" stroke="none" font-family="Source Sans 3" font-weight="700">yes</text>
+    </svg>
+    <h2>A column against the target</h2><p>Whether a column looks different for each answer.</p>
+  </a>
+  <a class="panel" href="#g-each" data-group="each">
+    <svg viewBox="0 0 200 120" fill="none" stroke="#682773" stroke-width="2" stroke-linecap="round">
+      <g stroke="#fff" stroke-width="2">
+        <rect x="56" y="14" width="30" height="30" fill="#682773"/><rect x="86" y="14" width="30" height="30" fill="#F4ECF6"/><rect x="116" y="14" width="30" height="30" fill="#FBEFE3"/>
+        <rect x="56" y="44" width="30" height="30" fill="#F4ECF6"/><rect x="86" y="44" width="30" height="30" fill="#682773"/><rect x="116" y="44" width="30" height="30" fill="#C9742C"/>
+        <rect x="56" y="74" width="30" height="30" fill="#FBEFE3"/><rect x="86" y="74" width="30" height="30" fill="#C9742C"/><rect x="116" y="74" width="30" height="30" fill="#682773"/>
+      </g>
+    </svg>
+    <h2>Columns against each other</h2><p>Which pairs of number columns are linked, and how strongly.</p>
+  </a>
+</div>
+
+<div id="layout">
+
+<!-- ============================================================ 1 -->
+<div class="group" id="g-one" hidden>
+<p class="gintro" data-draft>Before comparing anything, we look at each column on its own. The right chart depends on the kind of column in front of you, so first find out what kind it is: <code>dtypes</code> tells you whether pandas sees numbers or text, and <code>nunique()</code> tells you how many different values a column has. Then open the question that matches your column.</p>
+
+<section class="q" id="q-vone"><button class="qhead" aria-expanded="false"><span class="title">How do I visualise a number column?<small data-draft>The right chart depends on how many different values the column has, so we count them first.</small></span><span class="chev">▾</span></button>
+<div class="qbody"><div class="qinner">
+<p data-draft>Number columns do not all get the same chart. A column with many different values is drawn one way, and a column with only a few is drawn another. So first, we count how many different values the column has:</p>
+<div class="extra" data-draft><span class="tag">Interactive</span> Type a number column <input data-key="vcol" value="visits">, then run the code below.</div>
+<div class="codebox"><button class="copy">Copy</button><pre data-code="{df}['{vcol}'].nunique()"></pre></div>
+<div class="outbox"><span class="olabel">Example output</span><pre class="o">15</pre></div>
+<p data-draft>In the 30-member gym, <code>visits</code> has 15 different values. Find the card below that matches your own column, and follow it. Each card shows a column from the gym.</p>
+<div class="typecards">
+<div class="dscard"><h3>Many different values</h3><p class="tvals"><code>visits</code>: 0, 1, 2, 3, … 14<br>15 different values</p><p data-draft>A measurement or a count. We draw a histogram or a box plot.</p><p data-draft><a href="#vone-many" data-jump="vone-many">Histogram or box plot, below</a></p></div>
+<div class="dscard"><h3>A few different values</h3><p class="tvals"><code>classes</code>: 0, 1, 2, 3, 4<br>5 different values</p><p data-draft>Still an amount: 4 classes is more than 2. We draw one bar for each value.</p><p data-draft><a href="#vone-few" data-jump="vone-few">A bar for each value, below</a></p></div>
+<div class="dscard"><h3>A few values that are names</h3><p class="tvals"><code>branch</code>: 1, 2, 3<br>3 different values</p><p data-draft>Each number is the name of a branch: branch 3 is not more than branch 1. We treat it as a text column.</p><p data-draft><a href="#q-vcat" data-jump="q-vcat">The text column question</a></p></div>
+</div>
+<p data-draft>As a rough guide, "a few" means about ten different values or fewer. To tell the second card from the third, ask whether a bigger number means more of something. If it does not, the numbers are names.</p>
+<p data-draft>There is one more case. If the number of different values is the same as the number of rows (<code>len(df)</code> gives the number of rows), the column is an ID that only labels the rows, and it does not need a chart.</p>
+<p class="branchhead" id="vone-many" data-draft>Many different values: a histogram or a box plot</p>
+<p>A histogram shows the shape of a column, and a box plot sums it up in a small space.</p>
+<p>A histogram shows the number of times each value appears: it splits the column into ranges (the "bins"), counts how many rows fall in each range, and draws a bar that high.</p>
+<div class="extra"><span class="tag">Interactive</span> Type a number column <input data-key="vcol" value="visits"> and the number of bars <input data-key="vbins" value="15">, then run the code below.</div>
+<div class="codebox"><button class="copy">Copy</button><pre data-code="{df}['{vcol}'].hist(bins={vbins})
+plt.title(&quot;Distribution of {vcol}&quot;)
+plt.xlabel(&quot;{vcol}&quot;)
+plt.ylabel(&quot;Number of rows&quot;)
+plt.show()"></pre></div>
+<div class="figbox"><span class="olabel">Example output</span><img src="assets/vis_hist.png" alt="A histogram of visits for the 30-member gym, from 0 to 14, with the tallest bars for 0, 1 and 2 visits">
+<div class="figcap">In the 30-member gym, visits run from 0 to 14, and the tallest bars are for 0, 1 and 2 visits.</div></div>
+<p>Look for four things in your own histograms:</p>
+<ol class="steps-list">
+<li><b>A long tail:</b> a few values far bigger than the rest, which pull the average away from a typical value. In Bank Marketing, <code>balance</code> has an average of 1,362 but a middle value of 448.</li>
+<li><b>A spike at one value:</b> this may be a code (such as −1 for "never contacted"), a default that every record starts at, or a cap at a maximum. Find out which!</li>
+<li><b>Two humps:</b> the column may hold two different groups of rows.</li>
+<li><b>An even spread:</b> the values are spread across the range with no clear peak.</li>
+</ol>
+<p>A box plot shows the same column in a much smaller space. The box is the middle half of the data, the line inside it is the middle value (the median), and any dots are values more than 1.5 box-lengths beyond the box:</p>
+<div class="codebox"><button class="copy">Copy</button><pre data-code="{df}.boxplot(column='{vcol}', vert=False)
+plt.show()"></pre></div>
+<div class="figbox small"><span class="olabel">Example output</span><img src="assets/vis_box.png" alt="A box plot of gym visits: the box runs from 2 to 8.75 visits, the middle line is at 5, and there are no dots">
+<div class="figcap">The same 30 members: the middle half visited between 2 and 8.75 times, the middle value is 5, and no member is far enough out to be drawn as a dot.</div></div>
+<p>Pick the histogram when the shape itself matters (a tail, a spike, two humps). Pick the box plot when you are comparing several columns or groups side by side. In your report, say in one sentence why you chose the one you did.</p>
+<p class="branchhead" id="vone-few" data-draft>A few different values: a bar for each value</p>
+<p data-draft>In the gym, <code>classes</code> is the number of classes a member books each week, and it only takes five values: 0, 1, 2, 3 and 4. With this few values, we give every value its own bar. <code>value_counts()</code> counts the rows for each value, and <code>sort_index()</code> puts the bars in number order. Without it, the bars are sorted from the most common value to the least:</p>
+<div class="extra" data-draft><span class="tag">Interactive</span> Type a number column with only a few different values <input data-key="vfcol" value="classes">, then run the code below.</div>
+<div class="codebox"><button class="copy">Copy</button><pre data-code="{df}['{vfcol}'].value_counts().sort_index().plot(kind='bar')
+plt.xlabel(&quot;{vfcol}&quot;)
+plt.ylabel(&quot;Number of rows&quot;)
+plt.show()"></pre></div>
+<div class="figpair">
+<div class="figbox"><span class="olabel">Example output</span><img src="assets/vis_few.png" alt="A bar chart of classes booked per week in the 30-member gym, with one bar for each value from 0 to 4, falling from 8 members to 4">
+<div class="figcap" data-draft>A bar for each value: 8 members book no classes in a week, 7 book one, and only 4 book four.</div></div>
+<div class="figbox"><span class="olabel">The same column as a histogram</span><img src="assets/vis_few_hist.png" alt="A histogram of the same classes column, with five bars separated by wide gaps, and an axis labelled 0.0, 0.5, 1.0, 1.5 and so on">
+<div class="figcap" data-draft>The histogram code from above, run on the same column. It splits the column into ranges, so it leaves gaps between the bars, and labels the axis with values like 0.5 and 1.5 that no member has.</div></div>
+</div>
+<p data-draft>Read the bar chart like a histogram: where do most of the rows sit, and is any value almost empty?</p>
+<p data-draft>In your report, say what the values stand for (here, classes per week), because a reader cannot tell a count from a 1 to 4 scale by looking at the chart.</p>
+</div></div></section>
+
+
+
+<section class="q" id="q-vcat" data-new><button class="qhead" aria-expanded="false"><span class="title">How do I visualise a text column with a few categories?<small>For a text column with a handful of different words, and for number codes that are really names. A bar chart shows how many rows have each one.</small></span><span class="chev">▾</span></button>
+<div class="qbody"><div class="qinner">
+<p>A text column cannot go in a histogram, because words cannot be split into ranges. Instead, we count the rows for each category and draw one bar for each:</p>
+<div class="extra"><span class="tag">Interactive</span> Type a text column <input data-key="vccol" value="marital">, then run the code below.</div>
+<div class="codebox"><button class="copy">Copy</button><pre data-code="{df}['{vccol}'].value_counts().plot(kind='bar')
+plt.ylabel(&quot;Number of rows&quot;)
+plt.show()"></pre></div>
+<div class="figbox"><span class="olabel">Example output</span><img src="assets/vis_text.png" alt="A bar chart of marital status in Bank Marketing: married is the tallest bar, then single, then divorced">
+<div class="figcap">In Bank Marketing, 27,214 clients are married, 12,790 are single and 5,207 are divorced.</div></div>
+<p><code>value_counts()</code> sorts the bars from the most common category to the least, which makes the chart quick to read. Look for a category with very few rows, because anything you say about it later rests on those few rows.</p>
+<p>If the category names are long and hard to read on their side, change <code>kind='bar'</code> to <code>kind='barh'</code>, which draws the bars sideways and writes the names level.</p>
+<p>In your report, give the count or the share for each category you mention.</p>
+<p>The same chart is right for a number column whose numbers are names. In the gym, <code>branch</code> holds 1, 2 or 3, and each number is the name of a branch: branch 3 is not "more" than branch 1. A histogram or an average would treat the codes as amounts, so we count the rows for each code instead. Type the column into the box above, and run the same code:</p>
+<div class="figbox"><span class="olabel">Example output</span><img src="assets/vis_label.png" alt="A bar chart of the gym's branch codes: 5 members at branch 1, 3 at branch 2 and 2 at branch 3">
+<div class="figcap">In the 10-member gym, 5 members use branch 1, 3 use branch 2 and 2 use branch 3.</div></div>
+<p>Your reader will not know what code 1 means, so say what each code stands for in your report, or <a href="prepare.html#q-codes">swap the codes for names first, as the Prepare stage shows</a>.</p>
+</div></div></section>
+
+<section class="q" id="q-vorder" data-new><button class="qhead" aria-expanded="false"><span class="title">How do I visualise a text column where the categories have an order?<small>For words or ranges that run from low to high, like "&lt;1 year" then "1-4 years", or "[30-40)" then "[40-50)". The bars go in that order.</small></span><span class="chev">▾</span></button>
+<div class="qbody"><div class="qinner">
+<p>First, we list the categories, so that we can see exactly how each one is spelt:</p>
+<div class="extra"><span class="tag">Interactive</span> Type a text column whose categories have an order <input data-key="vocol" value="education">, then run the code below.</div>
+<div class="codebox"><button class="copy">Copy</button><pre data-code="{df}['{vocol}'].unique()"></pre></div>
+<div class="outbox"><span class="olabel">Example output</span><pre class="o">&lt;StringArray&gt;
+['tertiary', 'secondary', nan, 'primary']
+Length: 4, dtype: str</pre></div>
+<p>In Bank Marketing, <code>education</code> runs from primary to secondary to tertiary (<code>nan</code> is an empty cell, not a category). Sorted by count, the bars would come out as secondary, tertiary, primary, and the order would be lost. So we write the order ourselves, and <code>reindex</code> puts the bars in it:</p>
+<div class="extra"><span class="tag">Interactive</span> Type the categories in order, each in quotes and separated by commas <input data-key="voorder" value="'primary', 'secondary', 'tertiary'" class="wide">, then run the code below.</div>
+<div class="codebox"><button class="copy">Copy</button><pre data-code="order = [{voorder}]
+{df}['{vocol}'].value_counts().reindex(order).plot(kind='bar')
+plt.ylabel(&quot;Number of rows&quot;)
+plt.show()"></pre></div>
+<div class="figbox"><span class="olabel">Example output</span><img src="assets/vis_ordered.png" alt="A bar chart of education in Bank Marketing with the bars in order: primary, then secondary (the tallest), then tertiary">
+<div class="figcap">Bank Marketing clients by education, from lowest to highest: 6,851 primary, 23,202 secondary and 13,301 tertiary.</div></div>
+<p>If a bar is missing, check the spelling in your list. <code>reindex</code> only finds a category when it is typed exactly as it appears in the column, including capital letters and spaces.</p>
+<p>With the bars in order, you can see whether the counts rise, fall or peak in the middle, which a chart sorted by size would hide.</p>
+</div></div></section>
+
+<section class="q" id="q-vmonth" data-new><button class="qhead" aria-expanded="false"><span class="title">How do I visualise a month column stored as text?<small>For a column of month names. The bars go in calendar order, not alphabetical order.</small></span><span class="chev">▾</span></button>
+<div class="qbody"><div class="qinner">
+<p>A month column stored as text is an ordered text column, and its order is the calendar. Left alone, the months are sorted by count or by the alphabet, and the alphabet puts April first and September last. So we list the months in calendar order, and <code>reindex</code> puts the bars in it:</p>
+<div class="extra"><span class="tag">Interactive</span> Type your month column <input data-key="vmcol" value="month">, then run the code below.</div>
+<div class="codebox"><button class="copy">Copy</button><pre data-code="months = ['jan', 'feb', 'mar', 'apr', 'may', 'jun', 'jul', 'aug', 'sep', 'oct', 'nov', 'dec']
+{df}['{vmcol}'].value_counts().reindex(months).plot(kind='bar')
+plt.ylabel(&quot;Number of rows&quot;)
+plt.show()"></pre></div>
+<div class="figbox"><span class="olabel">Example output</span><img src="assets/vis_month.png" alt="A bar chart of Bank Marketing calls by month in calendar order, with May far taller than every other month">
+<div class="figcap">Bank Marketing calls by month: May has far more calls than any other month (13,766), and December has the fewest (214).</div></div>
+<p>The names in the list have to match your column exactly. Bank Marketing writes <code>jan</code>, <code>feb</code>, <code>mar</code>. If your column writes <code>Jan</code> or <code>January</code>, change the list to match (check with <code>unique()</code>, as in the previous question). The same idea works for days of the week.</p>
+<p>In calendar order, the chart can show a pattern through the year, such as a busy season. If a month has very few rows, be careful about anything you say about it.</p>
+</div></div></section>
+
+<section class="q" id="q-vmany" data-new><button class="qhead" aria-expanded="false"><span class="title">How do I visualise a text column with a lot of categories?<small>For a text column with too many different words to read on one chart. We keep the most common ones, and group the rest.</small></span><span class="chev">▾</span></button>
+<div class="qbody"><div class="qinner">
+<p>First, we count how many categories the column has:</p>
+<div class="extra"><span class="tag">Interactive</span> Type a text column <input data-key="vbcol" value="job"> and how many categories to keep <input data-key="vtopn" value="5">, then run the code below.</div>
+<div class="codebox"><button class="copy">Copy</button><pre data-code="{df}['{vbcol}'].nunique()"></pre></div>
+<div class="outbox"><span class="olabel">Example output</span><pre class="o">11</pre></div>
+<p>A bar for every category gets hard to read once there are more than about ten, and most of the bars are tiny. So we keep the most common categories, and add the rest together into one bar called "other". <code>head</code> keeps the top of the list, and <code>iloc</code> picks out everything after it:</p>
+<div class="codebox"><button class="copy">Copy</button><pre data-code="counts = {df}['{vbcol}'].value_counts()
+top = counts.head({vtopn})
+top['other'] = counts.iloc[{vtopn}:].sum()
+top.plot(kind='bar')
+plt.ylabel(&quot;Number of rows&quot;)
+plt.show()"></pre></div>
+<div class="figbox"><span class="olabel">Example output</span><img src="assets/vis_many.png" alt="A bar chart of the five most common jobs in Bank Marketing, from blue-collar to services, with a sixth bar for all other jobs">
+<div class="figcap">Bank Marketing's <code>job</code> column: the five most common jobs, and one bar for the other six jobs added together (8,811 clients).</div></div>
+<p>Bank Marketing's <code>job</code> has only 11 categories, so we kept 5 to show the idea. On a column with many more, start with 10. If "other" comes out as the tallest bar, keep more categories.</p>
+<p>In your report, say how many categories went into "other", so that the reader knows the bar is a mix.</p>
+</div></div></section>
+
+<section class="q" id="q-vyn" data-new><button class="qhead" aria-expanded="false"><span class="title">How do I visualise a yes/no column?<small>For a column with only two values, such as yes and no, True and False, or 1 and 0.</small></span><span class="chev">▾</span></button>
+<div class="qbody"><div class="qinner">
+<p>A yes/no column has only two values, so its chart is two bars:</p>
+<div class="extra"><span class="tag">Interactive</span> Type a yes/no column <input data-key="vycol" value="housing">, then run the code below.</div>
+<div class="codebox"><button class="copy">Copy</button><pre data-code="{df}['{vycol}'].value_counts().plot(kind='bar')
+plt.ylabel(&quot;Number of rows&quot;)
+plt.show()"></pre></div>
+<div class="figbox"><span class="olabel">Example output</span><img src="assets/vis_yesno.png" alt="A bar chart of the housing column in Bank Marketing: the yes bar is a little taller than the no bar">
+<div class="figcap">In Bank Marketing, 25,130 clients have a housing loan and 20,081 do not.</div></div>
+<p>With only two bars, the shares often say as much as the chart does:</p>
+<div class="codebox"><button class="copy">Copy</button><pre data-code="{df}['{vycol}'].value_counts(normalize=True).round(2)"></pre></div>
+<div class="outbox"><span class="olabel">Example output</span><pre class="o">housing
+yes    0.56
+no     0.44
+Name: proportion, dtype: float64</pre></div>
+<p>In your report, one sentence with the two shares is usually enough for a yes/no column (56% of clients have a housing loan). Keep the chart for the columns where the split is surprising, or where a later decision depends on it. The same code works when the two values are <code>True</code> and <code>False</code>, or 1 and 0.</p>
+</div></div></section>
+
+<section class="q" id="q-vtarget"><button class="qhead" aria-expanded="false"><span class="title">How do I visualise my target?<small>A bar chart shows how many rows have each answer.</small></span><span class="chev">▾</span></button>
+<div class="qbody"><div class="qinner">
+<p>A bar chart draws one bar for each answer, as tall as the number of rows with that answer. <code>value_counts()</code> does the counting, and <code>plot(kind='bar')</code> draws the bars:</p>
+<div class="codebox"><button class="copy">Copy</button><pre data-code="{df}['{target}'].value_counts().plot(kind='bar')
+plt.ylabel(&quot;Number of rows&quot;)
+plt.show()"></pre></div>
+<div class="figbox"><span class="olabel">Example output</span><img src="assets/vis_target_bar.png" alt="A bar chart of the 30-member gym: 18 renewed and 12 did not">
+<div class="figcap">The 30-member gym from week 6: 18 members renewed and 12 did not.</div></div>
+<p data-draft>The same code works when your target has more than two answers: you get one bar for each answer.</p>
+<p>To put the shares in your report, divide the counts by the number of rows:</p>
+<div class="codebox"><button class="copy">Copy</button><pre data-code="{df}['{target}'].value_counts(normalize=True).round(2)"></pre></div>
+<div class="outbox"><span class="olabel">Example output</span><pre class="o">renewed
+yes    0.6
+no     0.4
+Name: proportion, dtype: float64</pre></div>
+<p>Look at how far apart the two bars are. In Bank Marketing, 39,922 clients said no (88.3%) and 5,289 said yes (11.7%), which is 7.5 "no" for every "yes". A pie chart can show the same split, but slices are harder to compare by eye than bars, so a bar chart is the safer choice. In your report, give the counts and the shares, and say what the split means for your project.</p>
+</div></div></section>
+</div>
+
+<!-- ============================================================ 2 -->
+<div class="group" id="g-against" hidden>
+<p class="gintro">A column is useful to a model when it looks different for each answer. Drawing a column split by the target shows this at a glance, so that you know which columns carry a signal about the answer before you train anything. <span data-draft>As in the first panel, open the question that matches the type of your column.</span></p>
+
+<section class="q" id="q-vnum"><button class="qhead" aria-expanded="false"><span class="title"><span data-draft>How do I visualise a number column against the target?</span><small data-draft>As for a single column, the right chart depends on how many different values the column has.</small></span><span class="chev">▾</span></button>
+<div class="qbody"><div class="qinner">
+<p data-draft>The same split applies here as for a single number column. So first, we count how many different values the column has:</p>
+<div class="extra" data-draft><span class="tag">Interactive</span> Type a number column <input data-key="vcol2" value="visits">, then run the code below.</div>
+<div class="codebox"><button class="copy">Copy</button><pre data-code="{df}['{vcol2}'].nunique()"></pre></div>
+<div class="outbox"><span class="olabel">Example output</span><pre class="o">15</pre></div>
+<p data-draft>In the 30-member gym, <code>visits</code> has 15 different values. Find the card below that matches your own column, and follow it.</p>
+<div class="typecards">
+<div class="dscard"><h3>Many different values</h3><p class="tvals"><code>visits</code>: 0, 1, 2, 3, … 14<br>15 different values</p><p data-draft>A measurement or a count. We draw one histogram for each answer, on the same axes.</p><p data-draft><a href="#vnum-many" data-jump="vnum-many">Histograms for each answer, below</a></p></div>
+<div class="dscard"><h3>A few different values</h3><p class="tvals"><code>classes</code>: 0, 1, 2, 3, 4<br>5 different values</p><p data-draft>Still an amount. We work out the share of one answer for each value, and draw a bar for each.</p><p data-draft><a href="#vnum-few" data-jump="vnum-few">The share for each value, below</a></p></div>
+<div class="dscard"><h3>A few values that are names</h3><p class="tvals"><code>branch</code>: 1, 2, 3<br>3 different values</p><p data-draft>Each number is the name of a branch, not an amount. We treat it as a text column.</p><p data-draft><a href="#q-vtext" data-jump="q-vtext">The text column question</a></p></div>
+</div>
+<p class="branchhead" id="vnum-many" data-draft>Many different values: one histogram for each answer</p>
+<p>One histogram for each answer, drawn on the same axes, shows whether the groups look different.</p>
+<p><code>sns.histplot</code> draws one histogram, and <code>hue</code> splits it into one set of bars for each answer, in its own colour, with the same bins for both, so that the two groups can be compared directly.</p>
+<div class="extra"><span class="tag">Interactive</span> Type a number column <input data-key="vcol2" value="visits">, then run the code below.</div>
+<div class="codebox"><button class="copy">Copy</button><pre data-code="sns.histplot(data={df}, x='{vcol2}', hue='{target}', bins=15)
+plt.show()"></pre></div>
+<div class="figbox"><span class="olabel">Example output</span><img src="assets/vis_num_target.png" alt="Two histograms of gym visits: members who did not renew sit between 0 and 5 visits, and members who renewed spread from 1 to 14">
+<div class="figcap">In the 30-member gym, the members who did not renew all sit at the low end (0 to 5 visits), while the members who renewed spread from 1 to 14.</div></div>
+<p>Two different shapes mean the column holds a signal about the answer, so keep a note of it. The same shape for both answers means the column may add little, but do not delete it yet, because it may still help alongside other columns.</p>
+<p>When one answer is much more common than the other, raw counts flatten the smaller group into the bottom of the chart. In Bank Marketing, there are 7.5 times more "no" rows than "yes" rows. <code>stat='density'</code> with <code>common_norm=False</code> scales each group to the same total area, so that you compare the shapes, not the sizes:</p>
+<div class="codebox"><button class="copy">Copy</button><pre data-code="sns.histplot(data={df}, x='{vcol2}', hue='{target}', bins=15, stat='density', common_norm=False)
+plt.show()"></pre></div>
+<div class="figbox"><span class="olabel">Example output</span><img src="assets/vis_num_target_density.png" alt="The same two histograms of gym visits, each scaled to the same total area">
+<div class="figcap">The same gym, with each group scaled to the same area. The y axis now reads "Density" in place of a count.</div></div>
+<p>In your report, say what the chart shows about the two groups, and which later decision depends on it.</p>
+<p class="branchhead" id="vnum-few" data-draft>A few different values: the share of one answer for each value</p>
+<p data-draft>With only a few different values, we work out the share of each answer for every value of the column. <code>pd.crosstab</code> counts the rows for every pair of a value and an answer, and <code>normalize='index'</code> turns each row of counts into shares. Then we draw the share for one answer:</p>
+<div class="extra" data-draft><span class="tag">Interactive</span> Type a number column with only a few different values <input data-key="vfcol" value="classes"> and the answer to follow, in quotes if it is a word <input data-key="vans" value="'yes'">, then run the code below.</div>
+<div class="codebox"><button class="copy">Copy</button><pre data-code="rate = pd.crosstab({df}['{vfcol}'], {df}['{target}'], normalize='index')
+print(rate.round(2))
+rate[{vans}].plot(kind='bar')
+plt.ylabel(&quot;Share of rows&quot;)
+plt.show()"></pre></div>
+<div class="outbox"><span class="olabel">Example output</span><pre class="o">renewed    no   yes
+classes
+0        0.88  0.12
+1        0.57  0.43
+2        0.17  0.83
+3        0.00  1.00
+4        0.00  1.00</pre></div>
+<div class="figpair">
+<div class="figbox"><span class="olabel">Example output</span><img src="assets/vis_few_target.png" alt="A bar chart of the share of gym members who renewed for each number of classes, rising from 0.12 at no classes to 1.0 at three and four classes">
+<div class="figcap" data-draft>The share of members who renewed, for each number of classes: 12% of the members who book no classes, 83% of those who book two, and all of those who book three or four.</div></div>
+<div class="figbox"><span class="olabel">The same column as histograms</span><img src="assets/vis_few_target_hist.png" alt="Two see-through histograms of the classes column, one for each answer, with bars on top of each other at 0, 1 and 2 classes and wide gaps between them">
+<div class="figcap" data-draft>The histogram code from above, run on the same column. The bars for the two answers sit on top of each other with gaps in between, and the steady rise is much harder to see.</div></div>
+</div>
+<p data-draft>The bars are already in number order, because <code>crosstab</code> sorts the values. A share that rises or falls steadily from left to right means that the column holds a signal about the answer.</p>
+<p data-draft>If you see <code>KeyError</code>, the answer in the square brackets is not spelt the way it is in your target column.</p>
+<p data-draft>A share worked out from only a few rows can swing a long way. Check how many rows each value has with <code>value_counts()</code> before you write about it: in the gym, the bar for four classes rests on only 4 members.</p>
+</div></div></section>
+
+
+<section class="q" id="q-vtext"><button class="qhead" aria-expanded="false"><span class="title"><span data-draft>How do I visualise a text column against the target?</span><small>The share of each answer within each group shows which groups say yes more often.</small></span><span class="chev">▾</span></button>
+<div class="qbody"><div class="qinner">
+<p><code>pd.crosstab</code> counts the rows for every pair of a group and an answer. <code>normalize='index'</code> turns each group's counts into shares, so that a big group and a small group can be compared fairly:</p>
+<div class="extra"><span class="tag">Interactive</span> Type a text column <input data-key="vtcol" value="plan">, then run the code below.</div>
+<div class="codebox"><button class="copy">Copy</button><pre data-code="rate = pd.crosstab({df}['{vtcol}'], {df}['{target}'], normalize='index')
+print(rate.round(2))
+rate.plot(kind='barh')
+plt.show()"></pre></div>
+<div class="outbox"><span class="olabel">Example output</span><pre class="o">renewed   no  yes
+plan
+annual   0.2  0.8
+monthly  0.6  0.4</pre></div>
+<div class="figbox"><span class="olabel">Example output</span><img src="assets/vis_rate.png" alt="Horizontal bars of the share who renewed by plan: annual 0.8 renewed, monthly 0.4 renewed">
+<div class="figcap">In the 30-member gym, 80% of annual members renewed, compared with 40% of monthly members.</div></div>
+<p>In Bank Marketing, the same chart for <code>job</code> shows that students (28.7%) and retired clients (22.8%) said yes far more often than the overall rate of 11.7%. Bars of the share tell you which groups say yes more often, while bars of the counts tell you how many rows are in each group.</p>
+<p>A share worked out from only a few rows can swing a long way, so check how many rows each group has before you write about it:</p>
+<div class="codebox"><button class="copy">Copy</button><pre data-code="{df}['{vtcol}'].value_counts()"></pre></div>
+<div class="outbox"><span class="olabel">Example output</span><pre class="o">plan
+monthly    15
+annual     15
+Name: count, dtype: int64</pre></div>
+<p>In your report, give the number of rows next to any group whose share stands out.</p>
+<p data-draft>A column of number codes works the same way, because <code>crosstab</code> treats each code as a group.</p>
+</div></div></section>
+
+<section class="q" id="q-vordert" data-new><button class="qhead" aria-expanded="false"><span class="title"><span data-draft>How do I visualise an ordered text column against the target?</span><small>The same shares, with the bars in the order of the categories.</small></span><span class="chev">▾</span></button>
+<div class="qbody"><div class="qinner">
+<p><code>crosstab</code> sorts text categories by the alphabet, which is rarely their real order. So we add <code>reindex(order)</code>, with the categories listed in order:</p>
+<div class="extra"><span class="tag">Interactive</span> Type the text column <input data-key="vocol" value="education">, its categories in order <input data-key="voorder" value="'primary', 'secondary', 'tertiary'" class="wide"> and the answer to follow <input data-key="vans" value="'yes'">, then run the code below.</div>
+<div class="codebox"><button class="copy">Copy</button><pre data-code="order = [{voorder}]
+rate = pd.crosstab({df}['{vocol}'], {df}['{target}'], normalize='index').reindex(order)
+print(rate.round(2))
+rate[{vans}].plot(kind='bar')
+plt.ylabel(&quot;Share of rows&quot;)
+plt.show()"></pre></div>
+<div class="outbox"><span class="olabel">Example output</span><pre class="o">y            no   yes
+education
+primary    0.91  0.09
+secondary  0.89  0.11
+tertiary   0.85  0.15</pre></div>
+<div class="figbox"><span class="olabel">Example output</span><img src="assets/vis_ordered_target.png" alt="A bar chart of the share of Bank Marketing clients who said yes by education, rising from primary to secondary to tertiary">
+<div class="figcap">In Bank Marketing, the share of clients who said yes rises with education: 8.6% for primary, 10.6% for secondary and 15.0% for tertiary.</div></div>
+<p>With the bars in order, look for a share that climbs or falls from one end to the other. That pattern is easy to miss when the bars are sorted by the alphabet.</p>
+<p>For a month column, put the months in <code>order</code>, in calendar order. In Bank Marketing, this shows that March, September, October and December have a far higher share of "yes" than the other months (between 44% and 52%, against 7% in May). Those are also the four months with the fewest calls, so a big share from a small group needs its number of rows beside it.</p>
+</div></div></section>
+
+<section class="q" id="q-vynt" data-new><button class="qhead" aria-expanded="false"><span class="title"><span data-draft>How do I visualise a yes/no column against the target?</span><small>Two shares to compare: the answer among the rows with yes, and among the rows with no.</small></span><span class="chev">▾</span></button>
+<div class="qbody"><div class="qinner">
+<p>A yes/no column splits the rows into two groups, so we compare the share of each answer in the two groups:</p>
+<div class="extra"><span class="tag">Interactive</span> Type a yes/no column <input data-key="vycol" value="housing"> and the answer to follow <input data-key="vans" value="'yes'">, then run the code below.</div>
+<div class="codebox"><button class="copy">Copy</button><pre data-code="rate = pd.crosstab({df}['{vycol}'], {df}['{target}'], normalize='index')
+print(rate.round(2))
+rate[{vans}].plot(kind='bar')
+plt.ylabel(&quot;Share of rows&quot;)
+plt.show()"></pre></div>
+<div class="outbox"><span class="olabel">Example output</span><pre class="o">y          no   yes
+housing
+no       0.83  0.17
+yes      0.92  0.08</pre></div>
+<div class="figbox"><span class="olabel">Example output</span><img src="assets/vis_yesno_target.png" alt="A bar chart of the share of Bank Marketing clients who said yes: 0.167 for clients without a housing loan and 0.077 for clients with one">
+<div class="figcap">In Bank Marketing, 16.7% of the clients without a housing loan said yes, against 7.7% of the clients with one.</div></div>
+<p>Read the labels before the numbers! The table has one yes/no going down the side and another along the top. Here, the rows are <code>housing</code> and the columns are the target, <code>y</code>.</p>
+<p>With only two groups, a sentence can do the job of the chart: give both shares, and how many rows are in each group.</p>
+</div></div></section>
+</div>
+
+<!-- ============================================================ 3 -->
+<div class="group" id="g-each" hidden>
+<p class="gintro">Two number columns are linked when one goes up or down along with the other. A strong link can mean the two columns say the same thing, and a link with the target shows which columns move with the answer.</p>
+
+<section class="q" id="q-vheat"><button class="qhead" aria-expanded="false"><span class="title">How do I see how my number columns are linked?<small>A correlation heatmap shows the link between every pair of number columns in one picture.</small></span><span class="chev">▾</span></button>
+<div class="qbody"><div class="qinner">
+<p>A correlation is a number from −1 to 1. Close to 1 means the two columns go up together, close to −1 means one goes down as the other goes up, and close to 0 means there is little straight-line link. A heatmap colours each pair by its correlation. The loop in the code below turns a yes/no target into <code>True</code>/<code>False</code>, so that the target appears in the heatmap too.</p>
+<div class="extra"><span class="tag">Interactive</span> Type the number columns, each in quotes and separated by commas <input data-key="vcols" value="'age', 'visits', 'minutes', 'distance_km'" class="wide">, then run the code below.</div>
+<div class="codebox"><button class="copy">Copy</button><pre data-code="corr_df = {df}[[{vcols}, '{target}']].copy()
+for col in corr_df.columns:
+    if corr_df[col].isin([&quot;yes&quot;, &quot;no&quot;]).all():
+        corr_df[col] = corr_df[col] == &quot;yes&quot;
+
+sns.heatmap(corr_df.corr(), annot=True, cmap=&quot;coolwarm&quot;, vmin=-1, vmax=1)
+plt.show()"></pre></div>
+<div class="figbox"><span class="olabel">Example output</span><img src="assets/vis_heatmap.png" alt="A correlation heatmap of four gym columns and renewed. Visits and minutes are linked at 1, and renewed is linked to visits at 0.59 and minutes at 0.6">
+<div class="figcap">The 10-member gym from week 5, before any fixes. <code>visits</code> and <code>minutes</code> are linked at 1, and <code>renewed</code> is linked to both at about 0.6.</div></div>
+<p>Read the cells off the diagonal (the diagonal is each column against itself, so it is always 1). The target's row shows which columns move with the answer. A pair close to 1 or −1 may say the same thing twice, and the Prepare stage shows how to check and fix that. Correlation only sees straight-line links, and only between numbers, so use the text-column chart in the previous group for text columns.</p>
+<p>When there are only a few columns, or only one pair worth mentioning, a short table says it more simply than a heatmap. In Bank Marketing, the only pair above 0.3 is <code>pdays</code> and <code>previous</code>, at 0.45. If nothing is strongly linked, say so in your report, because a decision not to remove anything still needs its reason.</p>
+</div></div></section>
+</div>
+
+</div>
+
+</main>
+
+<script>
+const vals = {df:'df', target:'target', vcol:'visits', vbins:'15', vcol2:'visits', vtcol:'plan', vcols:"'age', 'visits', 'minutes', 'distance_km'",
+  vfcol:'classes', vccol:'marital', vocol:'education', voorder:"'primary', 'secondary', 'tertiary'", vmcol:'month', vbcol:'job', vtopn:'5', vycol:'housing', vans:"'yes'"};
+try{ Object.assign(vals, JSON.parse(localStorage.getItem('cw-names')||'{}')); }catch(e){}
+function sub(s){ return s.replace(/\{(\w+)\}/g, (m,k)=> vals[k] ?? m); }
+function esc(s){ return s.replace(/&/g,'&amp;').replace(/</g,'&lt;'); }
+function refresh(){ document.querySelectorAll('pre[data-code]').forEach(p=> p.innerHTML = esc(sub(p.dataset.code)));
+  document.getElementById('nm-df').textContent = vals.df; document.getElementById('nm-target').textContent = vals.target;
+  document.querySelectorAll('input[data-key]').forEach(i=>{ if(i.value!==vals[i.dataset.key]) i.value=vals[i.dataset.key]; }); }
+document.querySelectorAll('input[data-key]').forEach(i=> i.addEventListener('input', e=>{ vals[e.target.dataset.key]=e.target.value; try{localStorage.setItem('cw-names',JSON.stringify(vals));}catch(x){} refresh(); }));
+refresh();
+const nb=document.getElementById('namesbtn'), np=document.getElementById('namespanel');
+nb.addEventListener('click',()=>{ const open=np.hidden; np.hidden=!open; nb.setAttribute('aria-expanded',open); if(open) np.querySelector('input').focus(); });
+document.addEventListener('click',e=>{ if(!e.target.closest('.namesdock')){ np.hidden=true; nb.setAttribute('aria-expanded','false'); } });
+document.querySelectorAll('.copy').forEach(b=> b.addEventListener('click', ()=>{ const t = sub(b.parentElement.querySelector('pre').dataset.code); navigator.clipboard?.writeText(t).then(()=>{ b.textContent='Copied'; setTimeout(()=>b.textContent='Copy',1200); }); }));
+const qs=[...document.querySelectorAll('.q')];
+function setOpen(q, open){ q.classList.toggle('open', open); q.querySelector('.qhead').setAttribute('aria-expanded', open); }
+qs.forEach(q=> q.querySelector('.qhead').addEventListener('click', ()=>{
+  const opening = !q.classList.contains('open');
+  qs.forEach(o=>{ if(o!==q && o.classList.contains('open')) setOpen(o,false); });
+  setOpen(q, opening);
+  if(opening) setTimeout(()=> q.scrollIntoView({behavior:'smooth', block:'start'}), 60);
+}));
+let current = null;
+function pick(g, scroll){
+  if (g === current) g = null;
+  current = g;
+  document.querySelectorAll('.panel').forEach(x=>x.classList.toggle('on', x.dataset.group===g));
+  document.querySelectorAll('.group').forEach(x=>{ const on = g && x.id==='g-'+g; if(on && x.hidden){ x.hidden=false; x.classList.remove('show'); void x.offsetWidth; x.classList.add('show'); } else if(!on) x.hidden=true; });
+  if(g && scroll) document.getElementById('layout').scrollIntoView({behavior:'smooth',block:'start'});
+}
+document.querySelectorAll('.panel').forEach(a=>a.addEventListener('click',e=>{ e.preventDefault(); pick(a.dataset.group,true); }));
+// card links: scroll to a part of the open question, or open another question in the same panel
+document.querySelectorAll('a[data-jump]').forEach(a=> a.addEventListener('click', e=>{ e.preventDefault(); const t=document.getElementById(a.dataset.jump); if(!t) return;
+  if(t.classList.contains('q')){ qs.forEach(o=>{ if(o!==t && o.classList.contains('open')) setOpen(o,false); }); setOpen(t,true); setTimeout(()=> t.scrollIntoView({behavior:'smooth', block:'start'}), 60); }
+  else t.scrollIntoView({behavior:'smooth', block:'start'}); }));
+if(location.hash){ const q=document.querySelector(location.hash); if(q && q.classList.contains('q')){ if(q.closest('.group')) pick(q.closest('.group').id.slice(2),false); setOpen(q,true); q.scrollIntoView(); } }
+// review mode: ?review shades the wording added on 19 November (questions marked data-new, and anything marked data-draft)
+if(/[?&]review\b/.test(location.search)){ document.body.classList.add('review');
+  document.querySelectorAll('.q[data-new] .qinner > p, .q[data-new] .qhead small, .q[data-new] .figcap, .q[data-new] .extra').forEach(e=> e.setAttribute('data-draft','')); }
+</script>
+</body></html>

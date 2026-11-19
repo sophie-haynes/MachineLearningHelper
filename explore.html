@@ -1,0 +1,206 @@
+<!doctype html>
+<html lang="en-GB"><head><meta charset="utf-8"><meta name="viewport" content="width=device-width,initial-scale=1">
+<title>Explore · Coursework Helper</title>
+<link rel="stylesheet" href="https://fonts.googleapis.com/css2?family=Source+Sans+3:wght@400;600;700&family=Source+Code+Pro:wght@400;600&display=swap">
+<link rel="stylesheet" href="style.css">
+</head><body>
+<div class="topbar"></div>
+<div class="masthead"><a class="brand" href="index.html">CM3151 / CMM548 · Coursework Helper</a><span class="crumbs">› Stage 2 · Explore · Week 3</span>
+<div class="namesdock"><button class="namesbtn" id="namesbtn" aria-expanded="false">Your names: <code id="nm-df">df</code> · <code id="nm-target">target</code> <span class="chev">▾</span></button>
+<div class="namespanel" id="namespanel" hidden><p>Type the names from your own notebook once. Every code block on the page changes to match, and they are remembered on this computer.</p>
+<label>Your table <input data-key="df" value="df"></label><label>Your target column <input data-key="target" value="target"></label></div></div></div>
+<main class="wrap">
+<h1>Explore</h1>
+<div class="intro-text"><p>Before we edit our data, we first need to understand the characteristics of our data. The data exploration phase can be broken into three core questions: What do I have? What's wrong or weird? Does it matter? Your answers to these questions will guide you on decisions you make in the next sections of your project.</p></div>
+
+<div class="model" id="model">
+  <a class="panel" href="#g-have" data-group="have">
+    <svg viewBox="0 0 200 120" fill="none" stroke="#682773" stroke-width="2" stroke-linecap="round">
+      <rect x="20" y="22" width="160" height="80" rx="5" fill="#fff"/>
+      <path d="M20 44h160M60 22v80M100 22v80M140 22v80" stroke="#D8CDDD"/>
+      <text x="40" y="37" font-size="10" fill="#682773" stroke="none" font-family="Source Sans 3" font-weight="700" text-anchor="middle">age</text>
+      <text x="80" y="37" font-size="10" fill="#682773" stroke="none" font-family="Source Sans 3" font-weight="700" text-anchor="middle">job</text>
+      <text x="120" y="37" font-size="10" fill="#682773" stroke="none" font-family="Source Sans 3" font-weight="700" text-anchor="middle">balance</text>
+      <text x="160" y="37" font-size="10" fill="#682773" stroke="none" font-family="Source Sans 3" font-weight="700" text-anchor="middle">y</text>
+      <rect x="24" y="48" width="32" height="50" rx="3" fill="#EAF2FB" stroke="none"/><rect x="104" y="48" width="32" height="50" rx="3" fill="#EAF2FB" stroke="none"/>
+      <rect x="64" y="48" width="32" height="50" rx="3" fill="#EDF7F0" stroke="none"/><rect x="144" y="48" width="32" height="50" rx="3" fill="#F4ECF6" stroke="none"/>
+      <text x="40" y="112" font-size="9" fill="#2E6DA4" stroke="none" font-family="Source Sans 3" text-anchor="middle">number</text>
+      <text x="80" y="112" font-size="9" fill="#2E8B57" stroke="none" font-family="Source Sans 3" text-anchor="middle">text</text>
+      <text x="160" y="112" font-size="9" fill="#682773" stroke="none" font-family="Source Sans 3" text-anchor="middle">target</text>
+    </svg>
+    <h2>What do I have?</h2><p>How big the data is, what kind of value is in each column, and how the target is split.</p>
+  </a>
+  <a class="panel" href="#g-wrong" data-group="wrong">
+    <svg viewBox="0 0 200 120" fill="none" stroke="#682773" stroke-width="2" stroke-linecap="round">
+      <rect x="20" y="22" width="160" height="80" rx="5" fill="#fff"/>
+      <path d="M20 44h160M20 64h160M20 84h160M60 22v80M100 22v80M140 22v80" stroke="#D8CDDD"/>
+      <ellipse cx="80" cy="54" rx="17" ry="9" stroke="#C9742C" stroke-width="2.2"/>
+      <text x="80" y="58" font-size="10" fill="#C9742C" stroke="none" font-family="Source Code Pro" text-anchor="middle">NaN</text>
+      <ellipse cx="120" cy="94" rx="17" ry="9" stroke="#C9742C" stroke-width="2.2"/>
+      <text x="120" y="98" font-size="10" fill="#C9742C" stroke="none" font-family="Source Code Pro" text-anchor="middle">-1</text>
+      <ellipse cx="40" cy="74" rx="17" ry="9" stroke="#C9742C" stroke-width="2.2"/>
+      <text x="40" y="78" font-size="10" fill="#C9742C" stroke="none" font-family="Source Code Pro" text-anchor="middle">999</text>
+    </svg>
+    <h2>What's wrong or weird?</h2><p>Empty cells, codes standing in for empty cells, and values that are out of range.</p>
+  </a>
+  <a class="panel" href="#g-decide" data-group="decide">
+    <svg viewBox="0 0 200 120" fill="none" stroke="#682773" stroke-width="2" stroke-linecap="round">
+      <rect x="14" y="22" width="80" height="80" rx="5" fill="#fff"/>
+      <text x="54" y="38" font-size="9" fill="#6E6577" stroke="none" font-family="Source Sans 3" font-weight="700" text-anchor="middle" letter-spacing="1">FINDING</text>
+      <path d="M24 52h60M24 66h44M24 80h54" stroke="#682773" stroke-width="3"/>
+      <path d="M98 62h12" stroke="#C9742C"/><path d="M106 57l5 5-5 5" stroke="#C9742C"/>
+      <rect x="114" y="22" width="80" height="80" rx="5" fill="#EDF7F0" stroke="#2E8B57"/>
+      <text x="154" y="38" font-size="9" fill="#2E8B57" stroke="none" font-family="Source Sans 3" font-weight="700" text-anchor="middle" letter-spacing="1">DECISION</text>
+      <path d="M124 52h60M124 66h40M124 80h50" stroke="#2E8B57" stroke-width="3"/>
+    </svg>
+    <h2>Does it matter?</h2><p>Which of the things you found will affect what the model learns.</p>
+  </a>
+</div>
+
+<div id="layout">
+
+<div class="group" id="g-have" hidden>
+<p class="gintro">Before we can judge anything about our data, we need to know its basic shape: how big it is, what kind of value is in each column, and how the thing we are trying to predict is split.</p>
+
+<section class="q" id="q-shape"><button class="qhead" aria-expanded="false"><span class="title">How much data do I have?<small>The size of your dataset affects how long things take to run and how much you can trust what you find.</small></span><span class="chev">▾</span></button>
+<div class="qbody"><div class="qinner">
+<p>With our data loaded into a <code>pandas</code> <code>DataFrame</code>, we can get its size using <code>.shape</code>. This gives two numbers: the number of rows (each row is one example, in Bank Marketing one client) and the number of columns (each column is one piece of information about that example).</p>
+<div class="codebox"><button class="copy">Copy</button><pre data-code="{df}.shape"></pre></div>
+<div class="outbox"><span class="olabel">Example output</span><pre class="o">(45211, 17)</pre></div>
+<p>On the Bank Marketing dataset we have 45,211 rows and 17 columns. Write down your own two numbers, because they are the first thing you describe about your dataset in your report.</p>
+</div></div></section>
+
+<section class="q" id="q-types"><button class="qhead" aria-expanded="false"><span class="title">What types of data do I have in each column?<small>The first step in understanding your data is knowing what kinds of data you have.</small></span><span class="chev">▾</span></button>
+<div class="qbody"><div class="qinner">
+<p><code>pandas</code> works out a type for every column when the data is loaded. We can list those types using <code>.dtypes</code>.</p>
+<div class="codebox"><button class="copy">Copy</button><pre data-code="{df}.dtypes"></pre></div>
+<div class="outbox"><span class="olabel">Example output</span><pre class="o">age           int64
+job          object
+balance       int64
+day           int64
+contact      object
+...
+y            object</pre></div>
+<p>Here <code>int64</code> means a whole number, <code>float64</code> means a number with a decimal point, and <code>object</code> means text. Look down the list for your own data and check that each type matches what you expect. If you expected a column to contain text categories (e.g. a "DayOfWeek" column would be expected to contain <code>["Monday", "Tuesday", "Wednesday", ...]</code>) but it is actually numerical, take note of this! It can cause unexpected behaviour in future steps.</p>
+<p>It is also useful to keep the number columns and the text columns as two separate lists, because the analysis and visualisations we do later depend on the data type. <code>select_dtypes</code> builds these lists for us: <code>include='number'</code> picks out the number columns.</p>
+<div class="codebox"><button class="copy">Copy</button><pre data-code="numeric_cols = {df}.select_dtypes(include='number').columns.tolist()
+print(numeric_cols)"></pre></div>
+<div class="outbox"><span class="olabel">Example output</span><pre class="o">['age', 'balance', 'day', 'duration', 'campaign', 'pdays', 'previous']</pre></div>
+<p>On the Bank Marketing dataset this is our list of numerical columns. Look at the names in your own list. Is there anything you would not expect to be a number?</p>
+<p>Using <code>exclude='number'</code> gives us everything else, which is the text columns.</p>
+<div class="codebox"><button class="copy">Copy</button><pre data-code="text_cols = {df}.select_dtypes(exclude='number').columns.tolist()
+print(text_cols)"></pre></div>
+<div class="outbox"><span class="olabel">Example output</span><pre class="o">['job', 'marital', 'education', 'default', 'housing', 'loan', 'contact', 'month', 'poutcome', 'y']</pre></div>
+<p>This is our list of text columns. Your target column will usually appear here if its values are words like <code>yes</code> and <code>no</code>.</p>
+</div></div></section>
+
+<section class="q" id="q-values"><button class="qhead" aria-expanded="false"><span class="title">What values are in my columns?<small>Seeing the smallest, largest and typical value in each column tells you whether the numbers make sense.</small></span><span class="chev">▾</span></button>
+<div class="qbody"><div class="qinner">
+<p><code>.describe()</code> gives a summary of every number column at once: how many values it has, the average (<code>mean</code>), the smallest (<code>min</code>), the largest (<code>max</code>), and the value in the middle when sorted (<code>50%</code>, also called the median).</p>
+<div class="codebox"><button class="copy">Copy</button><pre data-code="{df}.describe().round(1)"></pre></div>
+<div class="outbox"><span class="olabel">Example output</span><pre class="o">          age   balance    day  duration  campaign    pdays  previous
+mean     40.9    1362.3   15.8     258.2       2.8     40.2       0.6
+50%      39.0     448.0   16.0     180.0       2.0     -1.0       0.0
+min      18.0   -8019.0    1.0       0.0       1.0     -1.0       0.0
+max      95.0  102127.0   31.0    4918.0      63.0    871.0     275.0</pre></div>
+<p>Read the <code>min</code> and <code>max</code> row for each column and ask whether those values are possible. In Bank Marketing, <code>pdays</code> is the number of days since the client was last contacted, and its minimum is −1. A negative number of days is not possible, so −1 must mean something else. The dataset's documentation says it means "never contacted before" (this is explained on the <a href="https://archive.ics.uci.edu/dataset/222/bank+marketing">UCI repository page for Bank Marketing</a>, under the column descriptions; check the same page for your own dataset!). Read the <code>min</code> and <code>max</code> of your own columns the same way, and look up any value that seems impossible.</p>
+<p>For text columns, <code>.describe()</code> reports different things: how many different values there are (<code>unique</code>), and the most common one (<code>top</code>).</p>
+<div class="codebox"><button class="copy">Copy</button><pre data-code="{df}.describe(include='object')"></pre></div>
+<div class="outbox"><span class="olabel">Example output</span><pre class="o">           job  marital education contact poutcome      y
+unique      12        3         3       2        3      2
+top     blue-collar married secondary cellular failure  no</pre></div>
+<p>A text column with a very large number of different values (e.g. a free-text comment, or an ID) will be hard to use later, so take note if you see one.</p>
+</div></div></section>
+
+<section class="q" id="q-balance"><button class="qhead" aria-expanded="false"><span class="title">How balanced is my target?<small>Knowing how the thing you are predicting is split tells you how hard the problem is.</small></span><span class="chev">▾</span></button>
+<div class="qbody"><div class="qinner">
+<p>In a classification problem, the target column holds the categories we want to predict. <code>value_counts()</code> counts how many rows fall into each category, and adding <code>normalize=True</code> gives the same counts as fractions of the whole.</p>
+<div class="codebox"><button class="copy">Copy</button><pre data-code="print({df}['{target}'].value_counts())
+print({df}['{target}'].value_counts(normalize=True).round(3))"></pre></div>
+<div class="outbox"><span class="olabel">Example output</span><pre class="o">no     39922
+yes     5289
+
+no     0.883
+yes    0.117</pre></div>
+<p>In Bank Marketing, 88% of clients said no and 12% said yes. When one category is much more common than the other, we call the dataset imbalanced. Write down your own split, because it decides which scores you can trust when you build models later.</p>
+</div></div></section>
+</div>
+
+<div class="group" id="g-wrong" hidden>
+<p class="gintro">Real data is rarely clean. Cells can be empty, a number can secretly be a code, and some values can be far outside the normal range. We need to find these things now, because a model will train on whatever it is given, including the problems.</p>
+
+<section class="q" id="q-gaps"><button class="qhead" aria-expanded="false"><span class="title">Which columns have gaps?<small>An empty cell is called a missing value, and a model cannot learn from an empty cell.</small></span><span class="chev">▾</span></button>
+<div class="qbody"><div class="qinner">
+<p><code>pandas</code> marks an empty cell as <code>NaN</code> (short for "not a number"). <code>.isnull()</code> checks every cell for <code>NaN</code>, and <code>.sum()</code> adds up the count for each column.</p>
+<div class="codebox"><button class="copy">Copy</button><pre data-code="{df}.isnull().sum()"></pre></div>
+<div class="outbox"><span class="olabel">Example output</span><pre class="o">age             0
+job           288
+education    1857
+contact     13020
+poutcome    36959
+y               0</pre></div>
+<p>In Bank Marketing, four columns have gaps. Turn each count into a percentage of your total rows (13,020 out of 45,211 is 29%). You will use these percentages in the Prepare stage to decide what to do about each column.</p>
+</div></div></section>
+
+<section class="q" id="q-hidden"><button class="qhead" aria-expanded="false"><span class="title">Is there a hidden gap in the data?<small>Some datasets record a missing value as a code, such as −1 or "unknown", and pandas does not know it is a gap.</small></span><span class="chev">▾</span></button>
+<div class="qbody"><div class="qinner">
+<p>The <code>.isnull()</code> check above only finds empty cells, so if missing data has been filled with a special value, that method will not catch it. You have to count the special value yourself. In Bank Marketing, we saw earlier that <code>pdays</code> uses −1 to mean "never contacted". Comparing the column with that value gives <code>True</code> for every row that has it, and <code>.sum()</code> counts the <code>True</code>s.</p>
+<div class="extra"><span class="tag">Interactive</span> To count the special coded missing values in your own dataset, type the column name <input data-key="col" value="pdays"> and the special code or value <input data-key="code_value" value="-1">, then run the code below on your data.</div>
+<div class="codebox"><button class="copy">Copy</button><pre data-code="({df}['{col}'] == {code_value}).sum()"></pre></div>
+<div class="outbox"><span class="olabel">Example output</span><pre class="o">36954</pre></div>
+<p>36,954 of the 45,211 rows (82%) have this code. That is a lot of hidden gaps, and <code>isnull()</code> reported none of them. Check the documentation for your own dataset to find out whether any column uses a code like this, and if so count it the same way (for a text code, put it in quotes: <code>== 'unknown'</code>).</p>
+</div></div></section>
+</div>
+
+<div class="group" id="g-decide" hidden>
+<p class="gintro">A gap or a strange value is only a problem if it affects what the model learns. The questions in this section help you work out which of the things you found matter, so that you can make a decision about each one.</p>
+
+<section class="q" id="q-separate"><button class="qhead" aria-expanded="false"><span class="title">Does a column look different for the two groups?<small>A column that looks different for the people in each group is the thing we are hoping to find.</small></span><span class="chev">▾</span></button>
+<div class="qbody"><div class="qinner">
+<p>One histogram per group shows this at a glance. <code>groupby</code> splits the rows by target category, and <code>hist</code> draws one set of bars for each. <code>alpha=0.5</code> makes the bars see-through, so that you can see where the two groups overlap.</p>
+<div class="extra"><span class="tag">Interactive</span> Type the number column to look at <input data-key="col2" value="age">, then run the code below on your data.</div>
+<div class="codebox"><button class="copy">Copy</button><pre data-code="{df}.groupby('{target}')['{col2}'].hist(alpha=0.5, legend=True, bins=30)
+plt.xlabel('{col2}')
+plt.show()"></pre></div>
+<div class="figbox"><span class="olabel">Example output</span><img src="assets/visits_by_group.png" alt="Two overlapping histograms of visits, one per group, with the did-not-renew group sitting to the left">
+<div class="figcap">In the gym from the lecture, <code>visits</code> looks different for the two groups: the members who did not renew sit to the left, and the members who renewed sit to the right.</div></div>
+<p>Try each of your number columns. For each one, write one line: overlaps, or sits apart. A column where the groups sit apart will help the model, and one where they overlap completely will not. Do not expect the gym's clean separation in real data! A useful column usually shifts the two humps a little rather than pulling them apart.</p>
+</div></div></section>
+</div>
+
+</div>
+</main>
+<script>
+const vals = {df:'df', target:'target', col:'pdays', code_value:'-1', col2:'age'};
+try{ Object.assign(vals, JSON.parse(localStorage.getItem('cw-names')||'{}')); }catch(e){}
+function sub(s){ return s.replace(/\{(\w+)\}/g, (m,k)=> vals[k] ?? m); }
+function esc(s){ return s.replace(/&/g,'&amp;').replace(/</g,'&lt;'); }
+function refresh(){ document.querySelectorAll('pre[data-code]').forEach(p=> p.innerHTML = esc(sub(p.dataset.code)));
+  document.getElementById('nm-df').textContent = vals.df; document.getElementById('nm-target').textContent = vals.target;
+  document.querySelectorAll('input[data-key]').forEach(i=>{ if(i.value!==vals[i.dataset.key]) i.value=vals[i.dataset.key]; }); }
+document.querySelectorAll('input[data-key]').forEach(i=> i.addEventListener('input', e=>{ vals[e.target.dataset.key]=e.target.value; try{localStorage.setItem('cw-names',JSON.stringify(vals));}catch(x){} refresh(); }));
+refresh();
+const nb=document.getElementById('namesbtn'), np=document.getElementById('namespanel');
+nb.addEventListener('click',()=>{ const open=np.hidden; np.hidden=!open; nb.setAttribute('aria-expanded',open); if(open) np.querySelector('input').focus(); });
+document.addEventListener('click',e=>{ if(!e.target.closest('.namesdock')){ np.hidden=true; nb.setAttribute('aria-expanded','false'); } });
+document.querySelectorAll('.copy').forEach(b=> b.addEventListener('click', ()=>{ const t = sub(b.parentElement.querySelector('pre').dataset.code); navigator.clipboard?.writeText(t).then(()=>{ b.textContent='Copied'; setTimeout(()=>b.textContent='Copy',1200); }); }));
+const qs=[...document.querySelectorAll('.q')];
+function setOpen(q, open){ q.classList.toggle('open', open); q.querySelector('.qhead').setAttribute('aria-expanded', open); }
+qs.forEach(q=> q.querySelector('.qhead').addEventListener('click', ()=>{
+  const opening = !q.classList.contains('open');
+  qs.forEach(o=>{ if(o!==q && o.classList.contains('open')) setOpen(o,false); });
+  setOpen(q, opening);
+  if(opening) setTimeout(()=> q.scrollIntoView({behavior:'smooth', block:'start'}), 60);
+}));
+let current = null;
+function pick(g, scroll){
+  if (g === current) g = null;
+  current = g;
+  document.querySelectorAll('.panel').forEach(x=>x.classList.toggle('on', x.dataset.group===g));
+  document.querySelectorAll('.group').forEach(x=>{ const on = g && x.id==='g-'+g; if(on && x.hidden){ x.hidden=false; x.classList.remove('show'); void x.offsetWidth; x.classList.add('show'); } else if(!on) x.hidden=true; });
+  if(g && scroll) document.getElementById('layout').scrollIntoView({behavior:'smooth',block:'start'});
+}
+document.querySelectorAll('.panel').forEach(a=>a.addEventListener('click',e=>{ e.preventDefault(); pick(a.dataset.group,true); }));
+if(location.hash){ const q=document.querySelector(location.hash); if(q){ pick(q.closest('.group').id.slice(2),false); setOpen(q,true); q.scrollIntoView(); } }
+</script>
+</body></html>

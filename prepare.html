@@ -1,0 +1,398 @@
+<!doctype html>
+<html lang="en-GB"><head><meta charset="utf-8"><meta name="viewport" content="width=device-width,initial-scale=1">
+<title>Prepare · Coursework Helper</title>
+<link rel="stylesheet" href="https://fonts.googleapis.com/css2?family=Source+Sans+3:wght@400;600;700&family=Source+Code+Pro:wght@400;600&display=swap">
+<link rel="stylesheet" href="style.css">
+</head><body>
+<div class="topbar"></div>
+<div class="masthead"><a class="brand" href="index.html">CM3151 / CMM548 · Coursework Helper</a><span class="crumbs">› Stage 4 · Prepare · Weeks 4 to 6</span>
+<div class="namesdock"><button class="namesbtn" id="namesbtn" aria-expanded="false">Your names: <code id="nm-df">df</code> · <code id="nm-target">target</code> <span class="chev">▾</span></button>
+<div class="namespanel" id="namespanel" hidden><p>Type the names from your own notebook once. Every code block on the page changes to match, and they are remembered on this computer.</p>
+<label>Your table <input data-key="df" value="df"></label><label>Your target column <input data-key="target" value="target"></label></div></div></div>
+<main class="wrap">
+<h1>Prepare</h1>
+<div class="intro-text"><p>In this stage, we start to fix this weirdness in preparation of training our model. This section focuses on how to treat missing data, how to separate out weird values, and when to completely remove unfair advantages.</p>
+<p>Extreme values, words, codes and dates, same scale and repeated columns come from week 5. The last group shows what to write when a check finds nothing to fix.</p></div>
+
+<div class="model four" id="model">
+  <a class="panel" href="#g-missing" data-group="missing">
+    <svg viewBox="0 0 200 120" fill="none" stroke="#682773" stroke-width="1.6" stroke-linecap="round"><rect x="22" y="6" width="156" height="68" rx="4" fill="#fff"/><rect x="22" y="6" width="156" height="17" rx="4" fill="#F4ECF6" stroke="none"/><path d="M22 23h156" stroke="#D8CDDD" stroke-width="1"/><path d="M22 40h156" stroke="#D8CDDD" stroke-width="1"/><path d="M22 57h156" stroke="#D8CDDD" stroke-width="1"/><path d="M74 6v68" stroke="#D8CDDD" stroke-width="1"/><path d="M120 6v68" stroke="#D8CDDD" stroke-width="1"/><rect x="22" y="6" width="156" height="68" rx="4"/><text x="48.0" y="18" font-size="8.5" fill="#682773" stroke="none" font-family="Source Code Pro" font-weight="700" text-anchor="middle">name</text><text x="48.0" y="35" font-size="8.5" fill="#3A3240" stroke="none" font-family="Source Code Pro" text-anchor="middle">Amy</text><text x="48.0" y="52" font-size="8.5" fill="#3A3240" stroke="none" font-family="Source Code Pro" text-anchor="middle">Dan</text><text x="48.0" y="69" font-size="8.5" fill="#3A3240" stroke="none" font-family="Source Code Pro" text-anchor="middle">Cara</text><text x="97.0" y="18" font-size="8.5" fill="#682773" stroke="none" font-family="Source Code Pro" font-weight="700" text-anchor="middle">age</text><text x="97.0" y="35" font-size="8.5" fill="#3A3240" stroke="none" font-family="Source Code Pro" text-anchor="middle">24</text><text x="97.0" y="52" font-size="8.5" fill="#3A3240" stroke="none" font-family="Source Code Pro" text-anchor="middle">45</text><text x="97.0" y="69" font-size="8.5" fill="#3A3240" stroke="none" font-family="Source Code Pro" text-anchor="middle"></text><text x="149.0" y="18" font-size="8.5" fill="#682773" stroke="none" font-family="Source Code Pro" font-weight="700" text-anchor="middle">plan</text><text x="149.0" y="35" font-size="8.5" fill="#3A3240" stroke="none" font-family="Source Code Pro" text-anchor="middle">monthly</text><text x="149.0" y="52" font-size="8.5" fill="#3A3240" stroke="none" font-family="Source Code Pro" text-anchor="middle">monthly</text><text x="149.0" y="69" font-size="8.5" fill="#3A3240" stroke="none" font-family="Source Code Pro" text-anchor="middle">annual</text><ellipse cx="97" cy="65" rx="19" ry="9" stroke="#C9742C" stroke-width="2"/><path d="M86 75l-24 16M97 75v16M108 75l24 16" stroke="#C9742C" stroke-width="1.4"/><text x="56" y="104" font-size="11" fill="#682773" stroke="none" font-family="Source Sans 3" font-weight="700" text-anchor="middle">fill</text><text x="97" y="104" font-size="11" fill="#682773" stroke="none" font-family="Source Sans 3" font-weight="700" text-anchor="middle">drop</text><text x="138" y="104" font-size="11" fill="#682773" stroke="none" font-family="Source Sans 3" font-weight="700" text-anchor="middle">keep</text></svg>
+    <h2>Missing values</h2><p>Fill the gap with a typical value, drop the row, or keep the gap as a fact.</p>
+  </a>
+  <a class="panel" href="#g-misleading" data-group="misleading">
+    <svg viewBox="0 0 200 120" fill="none" stroke="#682773" stroke-width="1.6" stroke-linecap="round"><rect x="4" y="6" width="66" height="80" rx="4" fill="#fff"/><rect x="4" y="6" width="66" height="16" rx="4" fill="#F4ECF6" stroke="none"/><rect x="35" y="55" width="34" height="14" fill="#FBEFE3" stroke="none"/><path d="M4 22h66" stroke="#D8CDDD" stroke-width="1"/><path d="M4 38h66" stroke="#D8CDDD" stroke-width="1"/><path d="M4 54h66" stroke="#D8CDDD" stroke-width="1"/><path d="M4 70h66" stroke="#D8CDDD" stroke-width="1"/><path d="M34 6v80" stroke="#D8CDDD" stroke-width="1"/><rect x="4" y="6" width="66" height="80" rx="4"/><text x="19.0" y="17" font-size="8.5" fill="#682773" stroke="none" font-family="Source Code Pro" font-weight="700" text-anchor="middle">name</text><text x="19.0" y="33" font-size="8.5" fill="#3A3240" stroke="none" font-family="Source Code Pro" text-anchor="middle">Amy</text><text x="19.0" y="49" font-size="8.5" fill="#3A3240" stroke="none" font-family="Source Code Pro" text-anchor="middle">Ben</text><text x="19.0" y="65" font-size="8.5" fill="#3A3240" stroke="none" font-family="Source Code Pro" text-anchor="middle">Eve</text><text x="19.0" y="81" font-size="8.5" fill="#3A3240" stroke="none" font-family="Source Code Pro" text-anchor="middle">Cara</text><text x="52.0" y="17" font-size="8.5" fill="#682773" stroke="none" font-family="Source Code Pro" font-weight="700" text-anchor="middle">visits</text><text x="52.0" y="33" font-size="8.5" fill="#3A3240" stroke="none" font-family="Source Code Pro" text-anchor="middle">12</text><text x="52.0" y="49" font-size="8.5" fill="#3A3240" stroke="none" font-family="Source Code Pro" text-anchor="middle">0</text><text x="52.0" y="65" font-size="8.5" fill="#3A3240" stroke="none" font-family="Source Code Pro" text-anchor="middle">-1</text><text x="52.0" y="81" font-size="8.5" fill="#3A3240" stroke="none" font-family="Source Code Pro" text-anchor="middle">8</text><path d="M76 46h12M84 42l4 4-4 4" stroke="#C9742C" stroke-width="1.8"/><rect x="94" y="6" width="102" height="80" rx="4" fill="#fff"/><rect x="94" y="6" width="102" height="16" rx="4" fill="#F4ECF6" stroke="none"/><rect x="95" y="55" width="64" height="14" fill="#EDF7F0" stroke="none"/><rect x="161" y="55" width="34" height="14" fill="#EDF7F0" stroke="none"/><path d="M94 22h102" stroke="#D8CDDD" stroke-width="1"/><path d="M94 38h102" stroke="#D8CDDD" stroke-width="1"/><path d="M94 54h102" stroke="#D8CDDD" stroke-width="1"/><path d="M94 70h102" stroke="#D8CDDD" stroke-width="1"/><path d="M160 6v80" stroke="#D8CDDD" stroke-width="1"/><rect x="94" y="6" width="102" height="80" rx="4"/><text x="127.0" y="17" font-size="7.5" fill="#682773" stroke="none" font-family="Source Code Pro" font-weight="700" text-anchor="middle">had_last_month</text><text x="127.0" y="33" font-size="7.5" fill="#3A3240" stroke="none" font-family="Source Code Pro" text-anchor="middle">True</text><text x="127.0" y="49" font-size="7.5" fill="#3A3240" stroke="none" font-family="Source Code Pro" text-anchor="middle">True</text><text x="127.0" y="65" font-size="7.5" fill="#3A3240" stroke="none" font-family="Source Code Pro" text-anchor="middle">False</text><text x="127.0" y="81" font-size="7.5" fill="#3A3240" stroke="none" font-family="Source Code Pro" text-anchor="middle">True</text><text x="178.0" y="17" font-size="7.5" fill="#682773" stroke="none" font-family="Source Code Pro" font-weight="700" text-anchor="middle">visits</text><text x="178.0" y="33" font-size="7.5" fill="#3A3240" stroke="none" font-family="Source Code Pro" text-anchor="middle">12</text><text x="178.0" y="49" font-size="7.5" fill="#3A3240" stroke="none" font-family="Source Code Pro" text-anchor="middle">0</text><text x="178.0" y="65" font-size="7.5" fill="#3A3240" stroke="none" font-family="Source Code Pro" text-anchor="middle">0</text><text x="178.0" y="81" font-size="7.5" fill="#3A3240" stroke="none" font-family="Source Code Pro" text-anchor="middle">8</text><text x="4" y="104" font-size="8" fill="#C9742C" stroke="none" font-family="Source Sans 3" font-weight="700" text-anchor="start">Eve had not joined yet, so -1 is a note,</text><text x="4" y="115" font-size="8" fill="#C9742C" stroke="none" font-family="Source Sans 3" font-weight="700" text-anchor="start">not a number of visits</text></svg>
+    <h2>Misleading values</h2><p>The note becomes its own yes/no column, and the code becomes a number that cannot be mistaken for a real one.</p>
+  </a>
+  <a class="panel" href="#g-unfair" data-group="unfair">
+    <svg viewBox="0 0 200 120" fill="none" stroke="#682773" stroke-width="1.6" stroke-linecap="round"><path d="M8 80h184" stroke="#D8CDDD" stroke-width="2"/><path d="M130 22v64" stroke="#682773" stroke-dasharray="3 3"/><text x="130" y="16" font-size="9" fill="#682773" stroke="none" font-family="Source Sans 3" font-weight="700" text-anchor="middle">the guess is made</text><rect x="8" y="52" width="32" height="18" rx="9" fill="#F4ECF6" stroke="#682773"/><text x="24.0" y="64.5" font-size="8.5" fill="#682773" stroke="none" font-family="Source Code Pro" text-anchor="middle">age</text><rect x="44" y="52" width="40" height="18" rx="9" fill="#F4ECF6" stroke="#682773"/><text x="64.0" y="64.5" font-size="8.5" fill="#682773" stroke="none" font-family="Source Code Pro" text-anchor="middle">visits</text><rect x="88" y="52" width="34" height="18" rx="9" fill="#F4ECF6" stroke="#682773"/><text x="105.0" y="64.5" font-size="8.5" fill="#682773" stroke="none" font-family="Source Code Pro" text-anchor="middle">plan</text><rect x="138" y="52" width="56" height="18" rx="9" fill="#FBEFE3" stroke="#C9742C"/><text x="166.0" y="64.5" font-size="8.5" fill="#682773" stroke="none" font-family="Source Code Pro" text-anchor="middle">cancelled</text><path d="M144 61h44" stroke="#C9742C" stroke-width="1.2"/><text x="66" y="100" font-size="9" fill="#682773" stroke="none" font-family="Source Sans 3" font-weight="700" text-anchor="middle">known before</text><text x="166" y="100" font-size="9" fill="#C9742C" stroke="none" font-family="Source Sans 3" font-weight="700" text-anchor="middle">known after</text><text x="166" y="112" font-size="8" fill="#C9742C" stroke="none" font-family="Source Sans 3" text-anchor="middle">so it cannot stay</text></svg>
+    <h2>Unfair advantages</h2><p>A column that is only filled in after the answer is known cannot stay.</p>
+  </a>
+  <a class="panel" href="#g-extreme" data-group="extreme">
+    <svg viewBox="0 0 200 120" fill="none" stroke="#682773" stroke-width="2" stroke-linecap="round">
+      <path d="M16 78h170" stroke="#D8CDDD"/>
+      <circle cx="24" cy="78" r="5" fill="#F4ECF6"/><circle cx="38" cy="78" r="5" fill="#F4ECF6"/><circle cx="52" cy="78" r="5" fill="#F4ECF6"/><circle cx="66" cy="78" r="5" fill="#F4ECF6"/><circle cx="31" cy="66" r="5" fill="#F4ECF6"/><circle cx="45" cy="66" r="5" fill="#F4ECF6"/><circle cx="59" cy="66" r="5" fill="#F4ECF6"/><circle cx="45" cy="54" r="5" fill="#F4ECF6"/>
+      <circle cx="176" cy="78" r="6" fill="#fff" stroke="#C9742C" stroke-width="2.2"/>
+      <path d="M96 40v52" stroke="#C9742C" stroke-dasharray="4 4"/>
+      <path d="M170 64c-20-26-54-30-68-18" stroke="#C9742C" stroke-width="1.6"/>
+      <text x="80" y="108" font-size="11" fill="#682773" stroke="none" font-family="Source Sans 3" font-weight="700">limit</text>
+    </svg>
+    <h2>Extreme values</h2><p>Decide whether a far-away value is a mistake or real, then fill it, cap it, or keep it.</p>
+  </a>
+  <a class="panel" href="#g-words" data-group="words">
+    <svg viewBox="0 0 200 120" fill="none" stroke="#682773" stroke-width="1.6" stroke-linecap="round"><text x="46" y="12" font-size="9" fill="#682773" stroke="none" font-family="Source Sans 3" font-weight="700" text-anchor="middle">before</text><text x="149" y="12" font-size="9" fill="#682773" stroke="none" font-family="Source Sans 3" font-weight="700" text-anchor="middle">after</text><rect x="4" y="20" width="84" height="20" rx="4" fill="#fff"/><text x="46" y="33.5" font-size="8" fill="#682773" stroke="none" font-family="Source Code Pro" text-anchor="middle">plan: monthly</text><path d="M91 30h8M95 26l4 4-4 4" stroke="#C9742C" stroke-width="1.6"/><rect x="102" y="20" width="94" height="20" rx="4" fill="#F4ECF6"/><text x="149" y="33.5" font-size="8" fill="#682773" stroke="none" font-family="Source Code Pro" text-anchor="middle">plan_monthly: True</text><rect x="4" y="52" width="84" height="20" rx="4" fill="#fff"/><text x="46" y="65.5" font-size="8" fill="#682773" stroke="none" font-family="Source Code Pro" text-anchor="middle">branch: 3</text><path d="M91 62h8M95 58l4 4-4 4" stroke="#C9742C" stroke-width="1.6"/><rect x="102" y="52" width="94" height="20" rx="4" fill="#F4ECF6"/><text x="149" y="65.5" font-size="8" fill="#682773" stroke="none" font-family="Source Code Pro" text-anchor="middle">branch: retail park</text><rect x="4" y="84" width="84" height="20" rx="4" fill="#fff"/><text x="46" y="97.5" font-size="8" fill="#682773" stroke="none" font-family="Source Code Pro" text-anchor="middle">joined: 2025-01</text><path d="M91 94h8M95 90l4 4-4 4" stroke="#C9742C" stroke-width="1.6"/><rect x="102" y="84" width="94" height="20" rx="4" fill="#F4ECF6"/><text x="149" y="97.5" font-size="8" fill="#682773" stroke="none" font-family="Source Code Pro" text-anchor="middle">months_member: 21</text></svg>
+    <h2>Words, codes and dates</h2><p>Turn words, number labels and dates into numbers a model can use.</p>
+  </a>
+  <a class="panel" href="#g-scale" data-group="scale">
+    <svg viewBox="0 0 200 120" fill="none" stroke="#682773" stroke-width="1.6" stroke-linecap="round"><text x="6" y="12" font-size="9" fill="#682773" stroke="none" font-family="Source Sans 3" font-weight="700" text-anchor="start">before</text><text x="6" y="30" font-size="8" fill="#682773" stroke="none" font-family="Source Code Pro" text-anchor="start">minutes</text><rect x="52" y="22" width="140" height="10" rx="2" fill="#F4ECF6"/><text x="192" y="44" font-size="8" fill="#6B6070" stroke="none" font-family="Source Sans 3" text-anchor="end">0 to 840</text><text x="6" y="56" font-size="8" fill="#682773" stroke="none" font-family="Source Code Pro" text-anchor="start">visits</text><rect x="52" y="48" width="3" height="10" rx="1" fill="#FBEFE3" stroke="#C9742C"/><text x="60" y="56" font-size="8" fill="#6B6070" stroke="none" font-family="Source Sans 3" text-anchor="start">0 to 15</text><path d="M6 68h188" stroke="#D8CDDD" stroke-width="1"/><text x="6" y="82" font-size="9" fill="#682773" stroke="none" font-family="Source Sans 3" font-weight="700" text-anchor="start">after</text><text x="6" y="98" font-size="8" fill="#682773" stroke="none" font-family="Source Code Pro" text-anchor="start">minutes</text><rect x="52" y="90" width="100" height="10" rx="2" fill="#F4ECF6"/><text x="6" y="114" font-size="8" fill="#682773" stroke="none" font-family="Source Code Pro" text-anchor="start">visits</text><rect x="52" y="106" width="100" height="10" rx="2" fill="#FBEFE3" stroke="#C9742C"/><text x="158" y="108" font-size="8" fill="#6B6070" stroke="none" font-family="Source Sans 3" text-anchor="start">0 to 1</text></svg>
+    <h2>Same scale</h2><p>Stop the column with the biggest numbers from deciding which rows look alike.</p>
+  </a>
+  <a class="panel" href="#g-repeat" data-group="repeat">
+    <svg viewBox="0 0 200 120" fill="none" stroke="#682773" stroke-width="1.6" stroke-linecap="round"><rect x="6" y="6" width="122" height="68" rx="4" fill="#fff"/><rect x="6" y="6" width="122" height="17" rx="4" fill="#F4ECF6" stroke="none"/><rect x="43" y="24" width="38" height="15" fill="#F4ECF6" stroke="none"/><rect x="83" y="24" width="44" height="15" fill="#F4ECF6" stroke="none"/><rect x="43" y="41" width="38" height="15" fill="#F4ECF6" stroke="none"/><rect x="83" y="41" width="44" height="15" fill="#F4ECF6" stroke="none"/><rect x="43" y="58" width="38" height="15" fill="#F4ECF6" stroke="none"/><rect x="83" y="58" width="44" height="15" fill="#F4ECF6" stroke="none"/><path d="M6 23h122" stroke="#D8CDDD" stroke-width="1"/><path d="M6 40h122" stroke="#D8CDDD" stroke-width="1"/><path d="M6 57h122" stroke="#D8CDDD" stroke-width="1"/><path d="M42 6v68" stroke="#D8CDDD" stroke-width="1"/><path d="M82 6v68" stroke="#D8CDDD" stroke-width="1"/><rect x="6" y="6" width="122" height="68" rx="4"/><text x="24.0" y="18" font-size="8.5" fill="#682773" stroke="none" font-family="Source Code Pro" font-weight="700" text-anchor="middle">name</text><text x="24.0" y="35" font-size="8.5" fill="#3A3240" stroke="none" font-family="Source Code Pro" text-anchor="middle">Amy</text><text x="24.0" y="52" font-size="8.5" fill="#3A3240" stroke="none" font-family="Source Code Pro" text-anchor="middle">Cara</text><text x="24.0" y="69" font-size="8.5" fill="#3A3240" stroke="none" font-family="Source Code Pro" text-anchor="middle">Dan</text><text x="62.0" y="18" font-size="8.5" fill="#682773" stroke="none" font-family="Source Code Pro" font-weight="700" text-anchor="middle">visits</text><text x="62.0" y="35" font-size="8.5" fill="#3A3240" stroke="none" font-family="Source Code Pro" text-anchor="middle">12</text><text x="62.0" y="52" font-size="8.5" fill="#3A3240" stroke="none" font-family="Source Code Pro" text-anchor="middle">8</text><text x="62.0" y="69" font-size="8.5" fill="#3A3240" stroke="none" font-family="Source Code Pro" text-anchor="middle">3</text><text x="105.0" y="18" font-size="8.5" fill="#682773" stroke="none" font-family="Source Code Pro" font-weight="700" text-anchor="middle">minutes</text><text x="105.0" y="35" font-size="8.5" fill="#3A3240" stroke="none" font-family="Source Code Pro" text-anchor="middle">660</text><text x="105.0" y="52" font-size="8.5" fill="#3A3240" stroke="none" font-family="Source Code Pro" text-anchor="middle">470</text><text x="105.0" y="69" font-size="8.5" fill="#3A3240" stroke="none" font-family="Source Code Pro" text-anchor="middle">150</text><text x="162" y="30" font-size="9" fill="#682773" stroke="none" font-family="Source Sans 3" text-anchor="middle">about</text><text x="162" y="42" font-size="9" fill="#682773" stroke="none" font-family="Source Sans 3" font-weight="700" text-anchor="middle">1 hour</text><text x="162" y="54" font-size="9" fill="#682773" stroke="none" font-family="Source Sans 3" text-anchor="middle">per visit</text><text x="100" y="98" font-size="10" fill="#C9742C" stroke="none" font-family="Source Sans 3" font-weight="700" text-anchor="middle">the same fact, counted twice</text></svg>
+    <h2>Repeated columns</h2><p>Keep one of two columns that say the same thing.</p>
+  </a>
+  <a class="panel" href="#g-nothing" data-group="nothing">
+    <svg viewBox="0 0 200 120" fill="none" stroke="#682773" stroke-width="1.6" stroke-linecap="round"><rect x="30" y="6" width="140" height="92" rx="5" fill="#fff"/><rect x="30" y="6" width="140" height="18" rx="5" fill="#F4ECF6" stroke="none"/><rect x="30" y="6" width="140" height="92" rx="5"/><text x="100" y="19" font-size="9" fill="#682773" stroke="none" font-family="Source Code Pro" font-weight="700" text-anchor="middle">isnull().sum()</text><text x="44" y="40" font-size="9" fill="#3A3240" stroke="none" font-family="Source Code Pro" text-anchor="start">name</text><text x="130" y="40" font-size="9" fill="#3A3240" stroke="none" font-family="Source Code Pro" text-anchor="end">0</text><path d="M142 34l3 3 6-7" stroke="#2E8B57" stroke-width="2"/><text x="44" y="56" font-size="9" fill="#3A3240" stroke="none" font-family="Source Code Pro" text-anchor="start">age</text><text x="130" y="56" font-size="9" fill="#3A3240" stroke="none" font-family="Source Code Pro" text-anchor="end">0</text><path d="M142 50l3 3 6-7" stroke="#2E8B57" stroke-width="2"/><text x="44" y="72" font-size="9" fill="#3A3240" stroke="none" font-family="Source Code Pro" text-anchor="start">visits</text><text x="130" y="72" font-size="9" fill="#3A3240" stroke="none" font-family="Source Code Pro" text-anchor="end">0</text><path d="M142 66l3 3 6-7" stroke="#2E8B57" stroke-width="2"/><text x="44" y="88" font-size="9" fill="#3A3240" stroke="none" font-family="Source Code Pro" text-anchor="start">plan</text><text x="130" y="88" font-size="9" fill="#3A3240" stroke="none" font-family="Source Code Pro" text-anchor="end">0</text><path d="M142 82l3 3 6-7" stroke="#2E8B57" stroke-width="2"/><text x="100" y="114" font-size="9" fill="#2E8B57" stroke="none" font-family="Source Sans 3" font-weight="700" text-anchor="middle">nothing to fix: write down the check</text></svg>
+    <h2>Nothing to fix</h2><p>When a check finds nothing, write down the check and what it showed.</p>
+  </a>
+</div>
+
+<div id="layout">
+
+<div class="group" id="g-missing" hidden>
+<p class="gintro">A model cannot learn from an empty cell, so every gap has to become something before we build a model. Which option is right depends on how many gaps the column has, and whether the gap itself tells you something.</p>
+
+<section class="q" id="q-fillnum"><button class="qhead" aria-expanded="false"><span class="title">How do I fill a gap in a number column?<small>The right choice when there are only a few gaps and the gap does not mean anything.</small></span><span class="chev">▾</span></button>
+<div class="qbody"><div class="qinner">
+<p>First, we work out what a typical value is, so that we know what to fill with. For a column whose values sit in an even spread, the average is fine:</p>
+<div class="codebox"><button class="copy">Copy</button><pre data-code="{df}['age'].mean()"></pre></div>
+<div class="outbox"><span class="olabel">Example output</span><pre class="o">35.6</pre></div>
+<p>In the gym from the lecture, the average age of the nine members we have is 35.6, so 36 is a reasonable typical age. For a column with a long tail (a few very large values pulling the average up), the middle value when sorted is a better "typical", because the tail does not move it. In Bank Marketing, <code>balance</code> has an average of 1,362, but:</p>
+<div class="codebox"><button class="copy">Copy</button><pre data-code="{df}['balance'].median()"></pre></div>
+<div class="outbox"><span class="olabel">Example output</span><pre class="o">448.0</pre></div>
+<div class="extra"><span class="tag">Interactive</span> To fill a gap in your own data, type the column name <input data-key="fcol" value="age"> and the value to fill with <input data-key="fill_value" value="36">, then run the code below.</div>
+<div class="codebox"><button class="copy">Copy</button><pre data-code="{df}['{fcol}'] = {df}['{fcol}'].fillna({fill_value})"></pre></div>
+<p>Nothing prints when this works. Run <code>isnull().sum()</code> again and the column's count should now be 0. In your report, say which value you filled with and why that one.</p>
+</div></div></section>
+
+<section class="q" id="q-filltext"><button class="qhead" aria-expanded="false"><span class="title">How do I fill a gap in a text column?<small>A text column has no average, so the typical value is the most common one.</small></span><span class="chev">▾</span></button>
+<div class="qbody"><div class="qinner">
+<p><code>mode()</code> gives the most common value in a column (the <code>[0]</code> takes the first, in case two values tie). In Bank Marketing:</p>
+<div class="codebox"><button class="copy">Copy</button><pre data-code="{df}['education'].mode()[0]"></pre></div>
+<div class="outbox"><span class="olabel">Example output</span><pre class="o">'secondary'</pre></div>
+<div class="extra"><span class="tag">Interactive</span> To fill a text column in your own data, type the column name <input data-key="tcol" value="education">, then run the code below.</div>
+<div class="codebox"><button class="copy">Copy</button><pre data-code="{df}['{tcol}'] = {df}['{tcol}'].fillna({df}['{tcol}'].mode()[0])"></pre></div>
+<p>Filling with the most common value makes that value a little more common still, so if the column has a lot of gaps (more than about one row in ten), look at the last question in this section before you fill: the gap may be worth keeping instead.</p>
+</div></div></section>
+
+<section class="q" id="q-droprows"><button class="qhead" aria-expanded="false"><span class="title">How do I drop the rows that have a gap?<small>The right choice when losing a few rows costs less than writing in made-up values.</small></span><span class="chev">▾</span></button>
+<div class="qbody"><div class="qinner">
+<p><code>dropna</code> removes the rows that have a gap, and <code>subset</code> says which column to check, so that gaps in other columns are left alone.</p>
+<div class="extra"><span class="tag">Interactive</span> Type the column name <input data-key="dcol" value="job">, then run the code below. Printing the shape before and after shows you exactly how many rows were removed.</div>
+<div class="codebox"><button class="copy">Copy</button><pre data-code="print({df}.shape)
+{df} = {df}.dropna(subset=['{dcol}'])
+print({df}.shape)"></pre></div>
+<div class="outbox"><span class="olabel">Example output</span><pre class="o">(45211, 17)
+(44923, 17)</pre></div>
+<p>In Bank Marketing, dropping the rows with a gap in <code>job</code> removes 288 rows, which is 0.6% of the table. Check that the number of rows removed matches the gap count you found in the Explore stage. If far more disappeared than you expected, the column name is misspelled or the gaps were bigger than you thought.</p>
+</div></div></section>
+
+<section class="q" id="q-keepgap"><button class="qhead" aria-expanded="false"><span class="title">How do I know whether to keep a gap instead?<small>If gaps are more common in one group of the target than the other, the gap itself is information.</small></span><span class="chev">▾</span></button>
+<div class="qbody"><div class="qinner">
+<p>To check this, we mark which rows have a gap, and then group those marks by the target. The <code>mean()</code> of a <code>True</code>/<code>False</code> column is the fraction that are <code>True</code>, so this gives the fraction of gaps in each category:</p>
+<div class="extra"><span class="tag">Interactive</span> Type the column name <input data-key="kcol" value="contact">, then run the code below on your data.</div>
+<div class="codebox"><button class="copy">Copy</button><pre data-code="missing_flag = {df}['{kcol}'].isnull()
+print(missing_flag.groupby({df}['{target}']).mean().round(2))"></pre></div>
+<div class="outbox"><span class="olabel">Example output</span><pre class="o">y
+no     0.31
+yes    0.10</pre></div>
+<p>In Bank Marketing, the <code>contact</code> column is missing for 31% of the clients who said no, but only 10% of those who said yes. The gap is not spread evenly, so it tells us something about the client, and filling it in would erase that. Keep it as a category of its own instead:</p>
+<div class="codebox"><button class="copy">Copy</button><pre data-code="{df}['{kcol}'] = {df}['{kcol}'].fillna('unknown')"></pre></div>
+<p>Run <code>value_counts()</code> on the column and <code>unknown</code> should appear with the count you expected (13,020 for <code>contact</code>). From here on, <code>unknown</code> is a value like any other, and the model can learn from it.</p>
+</div></div></section>
+</div>
+
+<div class="group" id="g-misleading" hidden>
+<p class="gintro">A misleading value is a number that is really a note, like −1 for "never contacted". The computer counts it as a real number, so it distorts every average it touches. The fix is to give the note its own column, and then replace the code with a number that cannot be mistaken for a real one.</p>
+
+<section class="q" id="q-split"><button class="qhead" aria-expanded="false"><span class="title">How do I split a misleading value into its own column?<small>The note becomes a yes/no column, and the code is replaced with a number that cannot be mistaken for a real one.</small></span><span class="chev">▾</span></button>
+<div class="qbody"><div class="qinner">
+<p>The first line asks every row "is this not the code?" and keeps the yes/no answers as a new column. The second line swaps every code for a replacement number. The new column's name is yours to choose; pick one that says what the note meant (in Bank Marketing, <code>was_contacted</code>).</p>
+<p>The replacement depends on whether a true value exists. In the gym, Eve's −1 visits became 0, because she had not joined yet and 0 really was her count. In Bank Marketing, a client who was never contacted has no true number of days since the last contact, so we write a number that cannot be mistaken for a real one: the largest real value in <code>pdays</code> is 871, so 999 sits safely beyond it, and the new column records what the 999 means. Check your column's largest real value with <code>.max()</code> before you choose.</p>
+<div class="extra"><span class="tag">Interactive</span> Type the column name <input data-key="mcol" value="pdays"> and the value that is really a note <input data-key="code_value" value="-1"> (in quotes if it is text). Then type the replacement <input data-key="new_value" value="999">: the true value if one exists, otherwise a number beyond the largest real one. Then run the code below.</div>
+<div class="codebox"><button class="copy">Copy</button><pre data-code="{df}['{mcol}_known'] = {df}['{mcol}'] != {code_value}
+{df}['{mcol}'] = {df}['{mcol}'].replace({code_value}, {new_value})"></pre></div>
+<p>Check the new column's counts:</p>
+<div class="codebox"><button class="copy">Copy</button><pre data-code="{df}['{mcol}_known'].value_counts()"></pre></div>
+<div class="outbox"><span class="olabel">Example output</span><pre class="o">False    36954
+True      8257</pre></div>
+<p>In Bank Marketing, 36,954 clients were never contacted before, which matches the count of −1s from the Explore stage. In your report, say what the code meant, where you found that out (the dataset's UCI page), and why you chose the replacement you did.</p>
+</div></div></section>
+</div>
+
+<div class="group" id="g-unfair" hidden>
+<p class="gintro">An unfair advantage is a column that is only filled in after the answer is known. No code can find it for you. You find it by asking, for every column: would I know this before I needed the guess? Once found, the fix is one line.</p>
+
+<section class="q" id="q-dropcol"><button class="qhead" aria-expanded="false"><span class="title">How do I remove a column?<small>For a column that is an unfair advantage, or one that is mostly empty.</small></span><span class="chev">▾</span></button>
+<div class="qbody"><div class="qinner">
+<p><code>drop</code> removes the columns you name, and you can list several inside the square brackets.</p>
+<div class="extra"><span class="tag">Interactive</span> Type the column name <input data-key="xcol" value="duration">, then run the code below.</div>
+<div class="codebox"><button class="copy">Copy</button><pre data-code="{df} = {df}.drop(columns=['{xcol}'])
+{df}.shape"></pre></div>
+<div class="outbox"><span class="olabel">Example output</span><pre class="o">(45211, 16)</pre></div>
+<p>In Bank Marketing, dropping <code>duration</code> leaves 16 columns. The same line is the fix for a column that is mostly empty, because a column with almost no values in it has almost nothing for a model to learn from. In your report, say which finding made you drop each column.</p>
+</div></div></section>
+</div>
+
+<div class="group" id="g-extreme" hidden>
+<p class="gintro">An extreme value sits far away from all the other values in its column, like a member who lives 250 km from their gym when everyone else lives within 8 km. One value like this can pull the average a long way, and it can squash every other value when we put the columns on the same scale. Before changing it, we need to decide whether it is a mistake or real, because the fix is different for each.</p>
+
+<section class="q" id="q-findfar"><button class="qhead" aria-expanded="false"><span class="title">How do I find a value far from all the others?<small>A box plot draws anything far from the rest as a single dot.</small></span><span class="chev">▾</span></button>
+<div class="qbody"><div class="qinner">
+<p>A box plot shows where most of the values in a column sit. The box holds the middle half of the rows, and the lines above and below it (the "whiskers") reach out to the furthest values that are not too far away. Anything beyond a whisker is drawn as a single dot, so that values far from the rest stand out.</p>
+<div class="extra"><span class="tag">Interactive</span> Type the name of a number column <input data-key="ocol" value="distance_km">, then run the code below.</div>
+<div class="codebox"><button class="copy">Copy</button><pre data-code="{df}['{ocol}'].plot(kind='box')
+plt.show()"></pre></div>
+<div class="figbox"><span class="olabel">Example output</span><img src="assets/prepare_box_distance.png" alt="A box plot of distance from the gym: a flat box near 0 km and a single dot at 250 km">
+<div class="figcap">In the gym from the lecture, nine members live between 1 and 8 km from their gym, so they are squashed into the flat box at the bottom. The single dot is one member, 250 km away.</div></div>
+<p>Next, we ask the data for the rows above a value you read off the plot, so that you can see whose values the dots are. Type the value <input class="inline" data-key="look" value="10"> and run:</p>
+<div class="codebox"><button class="copy">Copy</button><pre data-code="{df}.query(&quot;{ocol} &gt; {look}&quot;)"></pre></div>
+<div class="outbox"><span class="olabel">Example output</span><pre class="o">   name  age  visits  had_last_month  minutes  branch  distance_km    plan  \
+5  Finn   38      10            True      560       1          250  annual
+
+    joined renewed
+5  2024-02     yes</pre></div>
+<p>Look at each dot's whole row, because the other columns can help you decide whether the value could be real. A box plot marks dots by a rule of thumb, so it will nearly always show a few, and a dot on its own does not mean anything is wrong with the data.</p>
+</div></div></section>
+
+<section class="q" id="q-mistake"><button class="qhead" aria-expanded="false"><span class="title">How do I decide whether it is a mistake or real?<small>Your answer decides whether you fill the value in or keep it.</small></span><span class="chev">▾</span></button>
+<div class="qbody"><div class="qinner">
+<p>No code can make this decision for you. Compare the value with what the dataset's documentation (its UCI page) says the column holds, and ask whether a real row could have it. In the gym, Finn's 250 km could be a typo for 2.5, or Finn could have moved away and kept his membership.</p>
+<p><b>If it is a mistake</b> and you cannot tell what it should be, treat it as missing, and fill it with a typical value, as in the Missing values questions. First, we work out the average of the other values, so that we know what to fill with. Type the mistaken value <input class="inline" data-key="bad" value="250"> and run:</p>
+<div class="codebox"><button class="copy">Copy</button><pre data-code="{df}.query(&quot;{ocol} != {bad}&quot;)['{ocol}'].mean().round(0)"></pre></div>
+<div class="outbox"><span class="olabel">Example output</span><pre class="o">np.float64(4.0)</pre></div>
+<p>Then we swap the mistaken value for an empty cell (<code>np.nan</code>, which needs <code>import numpy as np</code> at the top of your notebook) and fill it. Type the value to fill with <input class="inline" data-key="fillx" value="4"> and run:</p>
+<div class="codebox"><button class="copy">Copy</button><pre data-code="{df}['{ocol}'] = {df}['{ocol}'].replace({bad}, np.nan).fillna({fillx})"></pre></div>
+<p><b>If it is real</b>, keep the row. You can cap the value, which the next question shows, or leave it exactly as it is. Leaving it can be the right choice for some models, which we come back to in the modelling weeks.</p>
+<p>Two things to watch, whichever you choose. First, work out any limit or fill value from the whole column, never separately for each group of the target. Your model will not know the target for new rows, so a fix that uses the target to change a column gives it an unfair advantage. Second, after capping, a box plot drawn separately for each group of the target can still show dots, because each group's box works out its own whiskers. That is expected, and it does not mean the cap failed.</p>
+<p>In your report, say which values you looked at, whether you decided each one was a mistake or real, and why.</p>
+</div></div></section>
+
+<section class="q" id="q-cap"><button class="qhead" aria-expanded="false"><span class="title">How do I cap a value that is real?<small>Capping keeps the member in your data without letting one value pull the average.</small></span><span class="chev">▾</span></button>
+<div class="qbody"><div class="qinner">
+<p>Capping means choosing a limit, and bringing anything above it down to the limit. We use the end of the box plot's top whisker as the limit, so that the limit is one you can explain. First, we find where the box starts (<code>q1</code>) and where it ends (<code>q3</code>). <code>quantile(0.25)</code> is the value a quarter of the rows sit below, and <code>quantile(0.75)</code> is the value a quarter of the rows sit above:</p>
+<div class="codebox"><button class="copy">Copy</button><pre data-code="q1 = {df}['{ocol}'].quantile(0.25)
+q3 = {df}['{ocol}'].quantile(0.75)
+print(&quot;The box starts at &quot; + str(q1) + &quot; and ends at &quot; + str(q3))"></pre></div>
+<div class="outbox"><span class="olabel">Example output</span><pre class="o">The box starts at 2.25 and ends at 5.75</pre></div>
+<p>The whisker reaches one and a half box heights above the top of the box, and the box height is <code>q3 - q1</code>:</p>
+<div class="codebox"><button class="copy">Copy</button><pre data-code="limit = q3 + 1.5 * (q3 - q1)
+print(&quot;Limit: &quot; + str(limit))"></pre></div>
+<div class="outbox"><span class="olabel">Example output</span><pre class="o">Limit: 11.0</pre></div>
+<p>In the gym, that is 5.75 + 1.5 × 3.5 = 11 km. Now we bring anything above the limit down to it. <code>clip</code> means "keep every value inside this limit", and nothing prints when it works:</p>
+<div class="codebox"><button class="copy">Copy</button><pre data-code="{df}['{ocol}'] = {df}['{ocol}'].clip(upper=limit)"></pre></div>
+<p>Finally, we check the average again:</p>
+<div class="codebox"><button class="copy">Copy</button><pre data-code="print(&quot;Average: &quot; + str({df}['{ocol}'].mean().round(1)))"></pre></div>
+<div class="outbox"><span class="olabel">Example output</span><pre class="o">Average: 4.4</pre></div>
+<p>In the gym, the average distance drops from 28.3 km to 4.4 km, which is close to where the members really live. Finn is still in the data at 11 km, so he still counts as living further away than everyone else. If the average has not changed, check that you ran the <code>clip</code> line and that the column name matches exactly. For a column with extreme values at the bottom as well, <code>clip(lower=...)</code> works in the same way, with the bottom whisker <code>q1 - 1.5 * (q3 - q1)</code> as the limit.</p>
+</div></div></section>
+</div>
+
+<div class="group" id="g-words" hidden>
+<p class="gintro">Most models in scikit-learn can only work with numbers. Some columns hold words, some hold numbers that are really labels, and some hold dates written as text. Each of these needs turning into numbers that mean what they say before a model can use them.</p>
+
+<section class="q" id="q-dummies"><button class="qhead" aria-expanded="false"><span class="title">How do I turn a text column into numbers?<small>The models in scikit-learn can only work with numbers.</small></span><span class="chev">▾</span></button>
+<div class="qbody"><div class="qinner">
+<p>First, we check what type of data pandas thinks each column holds:</p>
+<div class="codebox"><button class="copy">Copy</button><pre data-code="{df}.dtypes"></pre></div>
+<div class="outbox"><span class="olabel">Example output</span><pre class="o">name                str
+age               int64
+visits            int64
+had_last_month     bool
+minutes           int64
+branch            int64
+distance_km       int64
+plan                str
+joined              str
+renewed             str
+dtype: object</pre></div>
+<p>Columns shown as <code>str</code> or <code>object</code> (depending on your version of pandas) hold words. In the gym, <code>name</code> only labels the member and <code>renewed</code> is the target, so we set those two aside, and <code>joined</code> is a date (see the last question in this section). That leaves <code>plan</code>, and <code>branch</code> once its codes are swapped for names (next question).</p>
+<p><code>get_dummies</code> gives each word in a column its own yes/no column, so <code>plan</code> becomes <code>plan_annual</code> and <code>plan_monthly</code>. A member on the monthly plan gets <code>True</code> in <code>plan_monthly</code> and <code>False</code> in <code>plan_annual</code>.</p>
+<div class="extra"><span class="tag">Interactive</span> Type the word columns, each in quotes and separated by commas <input data-key="wcols" value="'plan', 'branch'" class="wide">, then run the code below.</div>
+<div class="codebox"><button class="copy">Copy</button><pre data-code="{df} = pd.get_dummies({df}, columns=[{wcols}])
+{df}.columns"></pre></div>
+<div class="outbox"><span class="olabel">Example output</span><pre class="o">Index(['name', 'age', 'visits', 'had_last_month', 'minutes', 'distance_km',
+       'joined', 'renewed', 'plan_annual', 'plan_monthly', 'branch_campus',
+       'branch_city centre', 'branch_retail park'],
+      dtype='str')</pre></div>
+<p>Check that each column you named has gone, and that one new column has appeared for each of its words. A column with many different words makes many new columns, so count them with <code>nunique()</code> before you run this. In your report, say which columns you turned into yes/no columns.</p>
+</div></div></section>
+
+<section class="q" id="q-codes"><button class="qhead" aria-expanded="false"><span class="title">How do I spot numbers that are really labels?<small>Whole numbers can be codes for categories, like gym branches 1, 2 and 3.</small></span><span class="chev">▾</span></button>
+<div class="qbody"><div class="qinner">
+<p>pandas reads a column of whole numbers as an amount (<code>int64</code>), even when each number is a label. Taking the average is a quick test, because an average of labels makes no sense:</p>
+<div class="extra"><span class="tag">Interactive</span> Type the name of a whole-number column <input data-key="ccol" value="branch">, then run the code below.</div>
+<div class="codebox"><button class="copy">Copy</button><pre data-code="{df}['{ccol}'].mean()"></pre></div>
+<div class="outbox"><span class="olabel">Example output</span><pre class="o">np.float64(1.7)</pre></div>
+<p>An average branch of 1.7 means nothing, because there is no gym number 1.7. Next, we count how many rows have each value:</p>
+<div class="codebox"><button class="copy">Copy</button><pre data-code="{df}['{ccol}'].value_counts()"></pre></div>
+<div class="outbox"><span class="olabel">Example output</span><pre class="o">branch
+1    5
+2    3
+3    2
+Name: count, dtype: int64</pre></div>
+<p>The dataset's documentation (its UCI page) is where you find what each code means. For the gym, 1 = city centre, 2 = campus and 3 = retail park, so we swap each code for its name. <code>map</code> takes a list of pairs inside curly brackets, each one a code and the name to swap it for.</p>
+<div class="extra"><span class="tag">Interactive</span> Type the pairs <input data-key="cmap" value='{1: "city centre", 2: "campus", 3: "retail park"}' class="wide">, then run the code below.</div>
+<div class="codebox"><button class="copy">Copy</button><pre data-code="{df}['{ccol}'] = {df}['{ccol}'].map({cmap})
+{df}['{ccol}'].value_counts()"></pre></div>
+<div class="outbox"><span class="olabel">Example output</span><pre class="o">branch
+city centre    5
+campus         3
+retail park    2
+Name: count, dtype: int64</pre></div>
+<p>The counts should match the ones before the swap. If some rows are missing from the counts, their code is not in your list of pairs. If the documentation does not say what the codes mean, you can still treat the column as labels by turning the numbers into text:</p>
+<div class="codebox"><button class="copy">Copy</button><pre data-code="{df}['{ccol}'] = {df}['{ccol}'].astype(str)"></pre></div>
+<p>Either way, the column now holds words, so it goes through <code>get_dummies</code> from the previous question.</p>
+</div></div></section>
+
+<section class="q" id="q-dates"><button class="qhead" aria-expanded="false"><span class="title">How do I turn a date into a number?<small>A model can't compare dates written as text, but it can compare a count of months.</small></span><span class="chev">▾</span></button>
+<div class="qbody"><div class="qinner">
+<p>To the computer, a date written as text, like <code>2025-01</code>, is only a label, so it cannot tell how far apart two dates are. Counting the months from each date up to a fixed day turns the column into an amount a model can compare. First, we tell pandas that the column holds dates, and set the fixed day.</p>
+<div class="extra"><span class="tag">Interactive</span> Type the date column <input data-key="datecol" value="joined">, the fixed day <input data-key="today" value="2026-10-01"> and a name for the new column <input data-key="newcol" value="months_member">, then run the code below.</div>
+<div class="codebox"><button class="copy">Copy</button><pre data-code="dates = pd.to_datetime({df}['{datecol}'])
+today = pd.Timestamp(&quot;{today}&quot;)"></pre></div>
+<p>Then we count the months between the two. Each whole year counts as 12 months, and the months part adds or takes away the rest. For Amy, who joined in January 2025, that is (2026 − 2025) × 12 + (10 − 1) = 21:</p>
+<div class="codebox"><button class="copy">Copy</button><pre data-code="{df}['{newcol}'] = (today.year - dates.dt.year) * 12 + (today.month - dates.dt.month)
+{df}[['{datecol}', '{newcol}']].head()"></pre></div>
+<div class="outbox"><span class="olabel">Example output</span><pre class="o">    joined  months_member
+0  2025-01             21
+1  2025-03             19
+2  2024-11             23
+3  2025-06             16
+4  2026-09              1</pre></div>
+<p>Check one row by hand, as we did for Amy. Choose a fixed day that makes sense for your data, such as the day the data was collected, and say which day you chose in your report. Once the new column is made, the date column has done its job, so we remove it:</p>
+<div class="codebox"><button class="copy">Copy</button><pre data-code="{df} = {df}.drop(columns=['{datecol}'])"></pre></div>
+</div></div></section>
+</div>
+
+<div class="group" id="g-scale" hidden>
+<p class="gintro">Some models compare rows by how far apart their values are, so a column with much bigger numbers than the rest decides which rows count as alike. Putting every number column on the same scale gives each column an equal say.</p>
+
+<section class="q" id="q-scale"><button class="qhead" aria-expanded="false"><span class="title">How do I put my number columns on the same scale?<small>Without it, the column with the biggest numbers decides which rows count as alike.</small></span><span class="chev">▾</span></button>
+<div class="qbody"><div class="qinner">
+<p>First, we compare the smallest and largest value in the number columns.</p>
+<div class="extra"><span class="tag">Interactive</span> Type the number columns, each in quotes and separated by commas <input data-key="scols" value="'visits', 'minutes', 'distance_km'" class="wide">, then run the code below.</div>
+<div class="codebox"><button class="copy">Copy</button><pre data-code="{df}[[{scols}]].agg(['min', 'max'])"></pre></div>
+<div class="outbox"><span class="olabel">Example output</span><pre class="o">     visits  minutes  distance_km
+min       0        0            1
+max      15      840          250</pre></div>
+<p>In the gym, <code>minutes</code> runs up to 840 while <code>visits</code> only reaches 15, so a difference of a few minutes would count for more than a difference of several visits. <code>MinMaxScaler</code> squeezes every column into 0 to 1, where 0 is the column's smallest value and 1 is its largest. Each value becomes (value − smallest) ÷ (largest − smallest).</p>
+<p>Look at the largest value of <code>distance_km</code> too: 250. One extreme value stretches the column, so after squeezing, every other member's distance would sit close to 0. Deal with extreme values before you scale.</p>
+<p>We join the scaler and the model together with <code>make_pipeline</code>, so that the smallest and largest values are worked out from the training set only, and the test set is squeezed using those same values:</p>
+<div class="codebox"><button class="copy">Copy</button><pre data-code="from sklearn.pipeline import make_pipeline
+from sklearn.preprocessing import MinMaxScaler
+from sklearn.neighbors import KNeighborsClassifier
+
+knn = make_pipeline(MinMaxScaler(), KNeighborsClassifier(n_neighbors=3))
+knn.fit(X_train, y_train)
+knn.score(X_test, y_test)"></pre></div>
+<div class="outbox"><span class="olabel">Example output</span><pre class="o">1.0</pre></div>
+<p><code>X_train</code>, <code>y_train</code>, <code>X_test</code> and <code>y_test</code> are your training set and test set, from <code>train_test_split</code>. For another model, swap <code>KNeighborsClassifier(n_neighbors=3)</code> for that model. For a model that does not need scaling, leave <code>MinMaxScaler()</code> out, and say why in your report.</p>
+</div></div></section>
+</div>
+
+<div class="group" id="g-repeat" hidden>
+<p class="gintro">Two columns that say the same thing make some models count the same fact twice. A correlation heatmap finds the pairs worth checking, and a quick sum shows whether one column can be worked out from the other.</p>
+
+<section class="q" id="q-repeat"><button class="qhead" aria-expanded="false"><span class="title">How do I find two columns that say the same thing?<small>A correlation heatmap shows how strongly each pair of columns is linked.</small></span><span class="chev">▾</span></button>
+<div class="qbody"><div class="qinner">
+<p>A correlation heatmap shows how strongly each pair of number columns is linked, from −1 to 1. A value close to 1 (or to −1) means one column can be worked out almost exactly from the other.</p>
+<div class="extra"><span class="tag">Interactive</span> Type the number columns, each in quotes and separated by commas <input data-key="ncols" value="'age', 'visits', 'minutes', 'distance_km', 'months_member'" class="wide">, then run the code below.</div>
+<div class="codebox"><button class="copy">Copy</button><pre data-code="sns.heatmap({df}[[{ncols}]].corr(), annot=True, cmap=&quot;coolwarm&quot;, vmin=-1, vmax=1)
+plt.show()"></pre></div>
+<div class="figbox"><span class="olabel">Example output</span><img src="assets/prepare_heatmap.png" alt="A correlation heatmap of five gym columns. The squares where minutes meets visits show 1. Every other pair is between −0.4 and 0.58.">
+<div class="figcap">In the gym, after Finn's distance was capped, the square where <code>minutes</code> meets <code>visits</code> shows 1. Every other pair of different columns is between −0.4 and 0.58.</div></div>
+<p>Before dropping anything, we check why the two columns are linked, by working out one from the other.</p>
+<div class="extra"><span class="tag">Interactive</span> Type the two linked columns <input data-key="col_a" value="visits"> and <input data-key="col_b" value="minutes">, then run the code below.</div>
+<div class="codebox"><button class="copy">Copy</button><pre data-code="({df}['{col_b}'] / {df}['{col_a}']).round(1)"></pre></div>
+<div class="outbox"><span class="olabel">Example output</span><pre class="o">0    55.0
+1     NaN
+2    58.8
+3    50.0
+4     NaN
+5    56.0
+6    45.0
+7    56.0
+8    58.3
+9    57.8
+dtype: float64</pre></div>
+<p>In the gym, each visit lasts about an hour, so <code>minutes</code> is <code>visits</code> said again in a different unit. (Ben and Eve show <code>NaN</code>, "not a number", because they made no visits, and you cannot divide by zero.) We keep one of the two and drop the other.</p>
+<div class="extra"><span class="tag">Interactive</span> Type the column to drop <input data-key="rcol" value="minutes">, then run the code below.</div>
+<div class="codebox"><button class="copy">Copy</button><pre data-code="{df} = {df}.drop(columns=['{rcol}'])
+{df}.columns"></pre></div>
+<p>In the gym, we kept <code>visits</code> because it is the column we cleaned in week 4. In your report, say which pair you found, why they are linked, and which one you kept and why.</p>
+</div></div></section>
+</div>
+
+<div class="group" id="g-nothing" hidden>
+<p class="gintro">Not every dataset has every problem. When a check finds nothing, that is still a finding, and the output of the check is your evidence.</p>
+
+<section class="q" id="q-nothing"><button class="qhead" aria-expanded="false"><span class="title">What do I write when a check finds nothing?<small>Finding no problem is a result: show the evidence, and say what it means for your data.</small></span><span class="chev">▾</span></button>
+<div class="qbody"><div class="qinner">
+<p>Every question on this page starts with a check, such as counting the empty cells or drawing a box plot. Run the check, even when you expect it to find nothing, so that you have the output to point to. For example, <code>isnull().sum()</code> counts the empty cells in each column:</p>
+<div class="codebox"><button class="copy">Copy</button><pre data-code="{df}.isnull().sum()"></pre></div>
+<div class="outbox"><span class="olabel">Example output</span><pre class="o">name              0
+age               0
+visits            0
+had_last_month    0
+minutes           0
+branch            0
+distance_km       0
+plan              0
+joined            0
+renewed           0
+dtype: int64</pre></div>
+<p>In the week 5 gym, every count is 0, so there is nothing to fill or drop. Write down the check you ran, what it showed, and what that means for your data. For example: “We counted the empty cells in every column with <code>isnull().sum()</code> and found none, so no filling or dropping was needed.” Keep the output in your notebook, so that the reader can see the evidence behind the sentence.</p>
+</div></div></section>
+</div>
+
+
+</div>
+
+
+
+
+</main>
+<script>
+const vals = {df:'df', target:'target', fcol:'age', fill_value:'36', tcol:'education', dcol:'job', kcol:'contact', mcol:'pdays', code_value:'-1', new_value:'999', xcol:'duration', ocol:'distance_km', look:'10', bad:'250', fillx:'4', wcols:"'plan', 'branch'", ccol:'branch', cmap:'{1: "city centre", 2: "campus", 3: "retail park"}', datecol:'joined', today:'2026-10-01', newcol:'months_member', scols:"'visits', 'minutes', 'distance_km'", ncols:"'age', 'visits', 'minutes', 'distance_km', 'months_member'", col_a:'visits', col_b:'minutes', rcol:'minutes'};
+try{ Object.assign(vals, JSON.parse(localStorage.getItem('cw-names')||'{}')); }catch(e){}
+function sub(s){ return s.replace(/\{(\w+)\}/g, (m,k)=> vals[k] ?? m); }
+function esc(s){ return s.replace(/&/g,'&amp;').replace(/</g,'&lt;'); }
+function refresh(){ document.querySelectorAll('pre[data-code]').forEach(p=> p.innerHTML = esc(sub(p.dataset.code)));
+  document.getElementById('nm-df').textContent = vals.df; document.getElementById('nm-target').textContent = vals.target;
+  document.querySelectorAll('input[data-key]').forEach(i=>{ if(i.value!==vals[i.dataset.key]) i.value=vals[i.dataset.key]; }); }
+document.querySelectorAll('input[data-key]').forEach(i=> i.addEventListener('input', e=>{ vals[e.target.dataset.key]=e.target.value; try{localStorage.setItem('cw-names',JSON.stringify(vals));}catch(x){} refresh(); }));
+refresh();
+const nb=document.getElementById('namesbtn'), np=document.getElementById('namespanel');
+nb.addEventListener('click',()=>{ const open=np.hidden; np.hidden=!open; nb.setAttribute('aria-expanded',open); if(open) np.querySelector('input').focus(); });
+document.addEventListener('click',e=>{ if(!e.target.closest('.namesdock')){ np.hidden=true; nb.setAttribute('aria-expanded','false'); } });
+document.querySelectorAll('.copy').forEach(b=> b.addEventListener('click', ()=>{ const t = sub(b.parentElement.querySelector('pre').dataset.code); navigator.clipboard?.writeText(t).then(()=>{ b.textContent='Copied'; setTimeout(()=>b.textContent='Copy',1200); }); }));
+const qs=[...document.querySelectorAll('.q')];
+function setOpen(q, open){ q.classList.toggle('open', open); q.querySelector('.qhead').setAttribute('aria-expanded', open); }
+qs.forEach(q=> q.querySelector('.qhead').addEventListener('click', ()=>{
+  const opening = !q.classList.contains('open');
+  qs.forEach(o=>{ if(o!==q && o.classList.contains('open')) setOpen(o,false); });
+  setOpen(q, opening);
+  if(opening) setTimeout(()=> q.scrollIntoView({behavior:'smooth', block:'start'}), 60);
+}));
+let current = null;
+function pick(g, scroll){
+  if (g === current) g = null;
+  current = g;
+  document.querySelectorAll('.panel').forEach(x=>x.classList.toggle('on', x.dataset.group===g));
+  document.querySelectorAll('.group').forEach(x=>{ const on = g && x.id==='g-'+g; if(on && x.hidden){ x.hidden=false; x.classList.remove('show'); void x.offsetWidth; x.classList.add('show'); } else if(!on) x.hidden=true; });
+  if(g && scroll) document.getElementById('layout').scrollIntoView({behavior:'smooth',block:'start'});
+}
+document.querySelectorAll('.panel').forEach(a=>a.addEventListener('click',e=>{ e.preventDefault(); pick(a.dataset.group,true); }));
+if(location.hash){ const q=document.querySelector(location.hash); if(q && q.classList.contains('q')){ if(q.closest('.group')) pick(q.closest('.group').id.slice(2),false); setOpen(q,true); q.scrollIntoView(); } }
+</script>
+</body></html>

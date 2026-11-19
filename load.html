@@ -1,0 +1,81 @@
+<!doctype html>
+<html lang="en-GB"><head><meta charset="utf-8"><meta name="viewport" content="width=device-width,initial-scale=1">
+<title>Load · Coursework Helper</title>
+<link rel="stylesheet" href="https://fonts.googleapis.com/css2?family=Source+Sans+3:wght@400;600;700&family=Source+Code+Pro:wght@400;600&display=swap">
+<link rel="stylesheet" href="style.css">
+</head><body>
+<div class="topbar"></div>
+<div class="masthead"><a class="brand" href="index.html">CM3151 / CMM548 · Coursework Helper</a><span class="crumbs">› Stage 1 · Load · Week 1</span>
+<div class="namesdock"><button class="namesbtn" id="namesbtn" aria-expanded="false">Your names: <code id="nm-df">df</code> · <code id="nm-target">target</code> <span class="chev">▾</span></button>
+<div class="namespanel" id="namespanel" hidden><p>Type the names from your own notebook once. Every code block on the page changes to match, and they are remembered on this computer.</p>
+<label>Your table <input data-key="df" value="df"></label><label>Your target column <input data-key="target" value="target"></label></div></div></div>
+<main class="wrap">
+<h1>Load</h1>
+<div class="intro-text"><p>Before we can explore our data, we need to get it into Python in a form we can work with. In this module we use a <code>pandas</code> <code>DataFrame</code>, which is a table with named columns, like a spreadsheet. Your dataset has been tidied and saved as a CSV file on Moodle, so loading it is one line of code. The three questions below get the file loaded and check that what arrived is what you expected.</p></div>
+
+<div id="layout">
+<div class="group">
+
+<section class="q" id="q-load"><button class="qhead" aria-expanded="false"><span class="title">How do I load my dataset?<small>Your data starts as a file on Moodle. This step turns it into a table that Python can work with.</small></span><span class="chev">▾</span></button>
+<div class="qbody"><div class="qinner">
+<p>First, download your dataset's CSV file from Moodle and put it in the same folder as your notebook. Then we load the tools we need: <code>pandas</code> for tables (we give it the short name <code>pd</code>), <code>numpy</code> for numbers, and <code>matplotlib</code> for charts. This cell goes at the top of every notebook you make for this module.</p>
+<div class="codebox"><button class="copy">Copy</button><pre data-code="import pandas as pd
+import numpy as np
+import matplotlib.pyplot as plt"></pre></div>
+<p>Nothing prints when this works. If you see a red error, run the cell again and check the spelling.</p>
+<p><code>pd.read_csv</code> reads a CSV file into a <code>DataFrame</code>. We give the table a short name so we can refer to it in every later step; most notebooks use <code>df</code>.</p>
+<div class="extra"><span class="tag">Interactive</span> Type the name of your CSV file <input data-key="filename" value="steel_plates.csv"> and the name you want to give your table <input data-key="df" value="df">, then run the code below.</div>
+<div class="codebox"><button class="copy">Copy</button><pre data-code="{df} = pd.read_csv('{filename}')"></pre></div>
+<p>Nothing prints here either. If you see <code>FileNotFoundError</code>, Python cannot see the file: check that it is in the same folder as your notebook and that the name matches exactly, including <code>.csv</code>. If you are working in Google Colab, you need to upload the file each time you open the notebook (click the folder icon on the left, then the upload button).</p>
+</div></div></section>
+
+<section class="q" id="q-check"><button class="qhead" aria-expanded="false"><span class="title">Did it load correctly?<small>A file can load without an error and still be wrong, so we look at the first few rows before going any further.</small></span><span class="chev">▾</span></button>
+<div class="qbody"><div class="qinner">
+<p><code>.head()</code> shows the first five rows of the table, with every column.</p>
+<div class="codebox"><button class="copy">Copy</button><pre data-code="{df}.head()"></pre></div>
+<div class="outbox"><span class="olabel">Example output</span><pre class="o">   X_Minimum  X_Maximum  Y_Minimum  Y_Maximum  Pixels_Areas  ...  type_of_steel  target
+0         42         50     270900     270944           267  ...           A300  Pastry
+1        645        651    2538079    2538108           108  ...           A300  Pastry
+2        829        835    1553913    1553931            71  ...           A300  Pastry
+3        853        860     369370     369415           176  ...           A400  Pastry
+4       1289       1306     498078     498335          2409  ...           A400  Pastry</pre></div>
+<p>Check three things. The column headings should be words, not <code>0, 1, 2</code> (if they are numbers, the file loaded without its header row). The values in each column should look like what the column name says (numbers where you expect numbers, words where you expect words). And the last column should be called <code>target</code>. If all three are right, your data has loaded correctly.</p>
+</div></div></section>
+
+<section class="q" id="q-target"><button class="qhead" aria-expanded="false"><span class="title">Which column am I trying to predict?<small>Every stage of the coursework uses the target column, so you need to know its name and what values it holds.</small></span><span class="chev">▾</span></button>
+<div class="qbody"><div class="qinner">
+<p>In every dataset on Moodle, the column we are trying to predict is the last one, and it is called <code>target</code>. <code>.unique()</code> lists the different values in it, which are the categories your model will learn to predict.</p>
+<div class="codebox"><button class="copy">Copy</button><pre data-code="{df}['{target}'].unique()"></pre></div>
+<div class="outbox"><span class="olabel">Example output</span><pre class="o">['Pastry', 'Z_Scratch', 'K_Scratch', 'Stains', 'Dirtiness', 'Bumps', 'Other_Faults']</pre></div>
+<p>For Steel Plates, there are seven kinds of fault, so this is a seven-class problem. Many of the other datasets have two values, <code>0</code> and <code>1</code>, where <code>1</code> is the outcome of interest (a customer who defaulted, a machine that failed). Check the dataset's page on the <a href="https://archive.ics.uci.edu/">UCI repository</a> to find out what each value means for your dataset.</p>
+<p>Finally, open <strong>Your names</strong> at the top right of this page and make sure your table name and target column match what you used here (<code>df</code> and <code>target</code>), so that the code on every other page uses the same names.</p>
+</div></div></section>
+
+</div>
+</div>
+</main>
+<script>
+const vals = {df:'df', target:'target', filename:'steel_plates.csv'};
+try{ Object.assign(vals, JSON.parse(localStorage.getItem('cw-names')||'{}')); }catch(e){}
+function sub(s){ return s.replace(/\{(\w+)\}/g, (m,k)=> vals[k] ?? m); }
+function esc(s){ return s.replace(/&/g,'&amp;').replace(/</g,'&lt;'); }
+function refresh(){ document.querySelectorAll('pre[data-code]').forEach(p=> p.innerHTML = esc(sub(p.dataset.code)));
+  document.getElementById('nm-df').textContent = vals.df; document.getElementById('nm-target').textContent = vals.target;
+  document.querySelectorAll('input[data-key]').forEach(i=>{ if(i.value!==vals[i.dataset.key]) i.value=vals[i.dataset.key]; }); }
+document.querySelectorAll('input[data-key]').forEach(i=> i.addEventListener('input', e=>{ vals[e.target.dataset.key]=e.target.value; try{localStorage.setItem('cw-names',JSON.stringify(vals));}catch(x){} refresh(); }));
+refresh();
+const nb=document.getElementById('namesbtn'), np=document.getElementById('namespanel');
+nb.addEventListener('click',()=>{ const open=np.hidden; np.hidden=!open; nb.setAttribute('aria-expanded',open); if(open) np.querySelector('input').focus(); });
+document.addEventListener('click',e=>{ if(!e.target.closest('.namesdock')){ np.hidden=true; nb.setAttribute('aria-expanded','false'); } });
+document.querySelectorAll('.copy').forEach(b=> b.addEventListener('click', ()=>{ const t = sub(b.parentElement.querySelector('pre').dataset.code); navigator.clipboard?.writeText(t).then(()=>{ b.textContent='Copied'; setTimeout(()=>b.textContent='Copy',1200); }); }));
+const qs=[...document.querySelectorAll('.q')];
+function setOpen(q, open){ q.classList.toggle('open', open); q.querySelector('.qhead').setAttribute('aria-expanded', open); }
+qs.forEach(q=> q.querySelector('.qhead').addEventListener('click', ()=>{
+  const opening = !q.classList.contains('open');
+  qs.forEach(o=>{ if(o!==q && o.classList.contains('open')) setOpen(o,false); });
+  setOpen(q, opening);
+  if(opening) setTimeout(()=> q.scrollIntoView({behavior:'smooth', block:'start'}), 60);
+}));
+if(location.hash){ const q=document.querySelector(location.hash); if(q){ setOpen(q,true); q.scrollIntoView(); } }
+</script>
+</body></html>
