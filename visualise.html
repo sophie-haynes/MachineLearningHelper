@@ -14,12 +14,19 @@
 <link rel="stylesheet" href="style.css">
 <style>
   body.review [data-draft]{background:#FFF6D6;box-shadow:0 0 0 3px #FFF6D6;border-radius:3px}
-  .typecards{display:grid;grid-template-columns:repeat(3,1fr);gap:.8rem;margin:.7rem 0 1rem}
-  .typecards .dscard{padding:.8rem .9rem}
-  .typecards .dscard p{max-width:none;margin:.35rem 0 0;font-size:.93rem;line-height:1.4}
-  .typecards .tvals{background:var(--purple-soft);border-radius:8px;padding:.4rem .6rem;font-family:var(--mono);font-size:.84rem;color:var(--purple-dark)}
-  .typecards .tvals code{background:none;padding:0;font-weight:600}
-  .branchhead{font-size:1.12rem!important;font-weight:700;color:var(--purple-dark);border-top:1.5px solid var(--line);margin-top:1.6rem!important;padding-top:1rem;max-width:none!important;scroll-margin-top:.8rem}
+  .typecards{display:grid;grid-template-columns:repeat(3,1fr);gap:.8rem;margin:.7rem 0 .4rem}
+  .tcard{display:block;position:relative;text-decoration:none;color:inherit;padding:.8rem .9rem;cursor:pointer;transition:border-color .15s,box-shadow .15s}
+  .tcard:hover,.tcard.on{border-color:var(--purple);box-shadow:0 10px 24px -16px rgba(104,39,115,.5)}
+  .tcard.on{background:var(--purple-soft)}
+  .tcard h3{padding-right:1.2rem}
+  .tcard .chev{position:absolute;top:.7rem;right:.8rem;color:var(--muted);transition:transform .25s}
+  .tcard.on .chev{transform:rotate(180deg)}
+  .tcard p{max-width:none;margin:.35rem 0 0;font-size:.93rem;line-height:1.4}
+  .tcard .tvals{background:#fff;border:1px solid var(--line);border-radius:8px;padding:.4rem .6rem;font-family:var(--mono);font-size:.84rem;color:var(--purple-dark)}
+  .tcard .tvals code{background:none;padding:0;font-weight:600}
+  .branch{border-left:3px solid var(--purple);padding:.1rem 0 .3rem 1rem;margin:.9rem 0 .4rem;animation:rise .3s both}
+  .branch[hidden]{display:none}
+  .branchhead{font-size:1.12rem!important;font-weight:700;color:var(--purple-dark);max-width:none!important}
   .figpair{display:grid;grid-template-columns:1fr 1fr;gap:1rem;margin:.9rem 0 .5rem}
   .figpair .figbox{max-width:none;margin:0}
   @media (max-width:760px){.typecards,.figpair{grid-template-columns:1fr}}
@@ -79,15 +86,14 @@
 <div class="extra" data-draft><span class="tag">Interactive</span> Type a number column <input data-key="vcol" value="visits">, then run the code below.</div>
 <div class="codebox"><button class="copy">Copy</button><pre data-code="{df}['{vcol}'].nunique()"></pre></div>
 <div class="outbox"><span class="olabel">Example output</span><pre class="o">15</pre></div>
-<p data-draft>In the 30-member gym, <code>visits</code> has 15 different values. Find the card below that matches your own column, and follow it. Each card shows a column from the gym.</p>
+<p data-draft>In the 30-member gym, <code>visits</code> has 15 different values. Find the card below that matches your own column, and open it. Each card shows a column from the gym.</p>
 <div class="typecards">
-<div class="dscard"><h3>Many different values</h3><p class="tvals"><code>visits</code>: 0, 1, 2, 3, … 14<br>15 different values</p><p data-draft>A measurement or a count. We draw a histogram or a box plot.</p><p data-draft><a href="#vone-many" data-jump="vone-many">Histogram or box plot, below</a></p></div>
-<div class="dscard"><h3>A few different values</h3><p class="tvals"><code>classes</code>: 0, 1, 2, 3, 4<br>5 different values</p><p data-draft>Still an amount: 4 classes is more than 2. We draw one bar for each value.</p><p data-draft><a href="#vone-few" data-jump="vone-few">A bar for each value, below</a></p></div>
-<div class="dscard"><h3>A few values that are names</h3><p class="tvals"><code>branch</code>: 1, 2, 3<br>3 different values</p><p data-draft>Each number is the name of a branch: branch 3 is not more than branch 1. We treat it as a text column.</p><p data-draft><a href="#q-vcat" data-jump="q-vcat">The text column question</a></p></div>
+<a class="dscard tcard" href="#vone-many" data-branch="vone-many" role="button" aria-expanded="false"><span class="chev">▾</span><h3>Many different values</h3><p class="tvals"><code>visits</code>: 0, 1, 2, 3, … 14<br>15 different values</p><p data-draft>A measurement or a count. We draw a histogram or a box plot.</p></a>
+<a class="dscard tcard" href="#vone-few" data-branch="vone-few" role="button" aria-expanded="false"><span class="chev">▾</span><h3>A few different values</h3><p class="tvals"><code>classes</code>: 0, 1, 2, 3, 4<br>5 different values</p><p data-draft>About ten values or fewer, and still an amount: 4 classes is more than 2. We draw one bar for each value.</p></a>
+<a class="dscard tcard" href="#vone-names" data-branch="vone-names" role="button" aria-expanded="false"><span class="chev">▾</span><h3>A few numbers that stand for names</h3><p class="tvals"><code>branch</code>: 1, 2, 3<br>1 means city centre<br>2 means campus<br>3 means retail park<br>3 different values</p><p data-draft>The numbers are codes for the gym's branches, so branch 3 is not more than branch 1. We treat the column as text.</p></a>
 </div>
-<p data-draft>As a rough guide, "a few" means about ten different values or fewer. To tell the second card from the third, ask whether a bigger number means more of something. If it does not, the numbers are names.</p>
-<p data-draft>There is one more case. If the number of different values is the same as the number of rows (<code>len(df)</code> gives the number of rows), the column is an ID that only labels the rows, and it does not need a chart.</p>
-<p class="branchhead" id="vone-many" data-draft>Many different values: a histogram or a box plot</p>
+<div class="branch" id="vone-many" hidden>
+<p class="branchhead" data-draft>Many different values: a histogram or a box plot</p>
 <p>A histogram shows the shape of a column, and a box plot sums it up in a small space.</p>
 <p>A histogram shows the number of times each value appears: it splits the column into ranges (the "bins"), counts how many rows fall in each range, and draws a bar that high.</p>
 <div class="extra"><span class="tag">Interactive</span> Type a number column <input data-key="vcol" value="visits"> and the number of bars <input data-key="vbins" value="15">, then run the code below.</div>
@@ -111,7 +117,9 @@ plt.show()"></pre></div>
 <div class="figbox small"><span class="olabel">Example output</span><img src="assets/vis_box.png" alt="A box plot of gym visits: the box runs from 2 to 8.75 visits, the middle line is at 5, and there are no dots">
 <div class="figcap">The same 30 members: the middle half visited between 2 and 8.75 times, the middle value is 5, and no member is far enough out to be drawn as a dot.</div></div>
 <p>Pick the histogram when the shape itself matters (a tail, a spike, two humps). Pick the box plot when you are comparing several columns or groups side by side. In your report, say in one sentence why you chose the one you did.</p>
-<p class="branchhead" id="vone-few" data-draft>A few different values: a bar for each value</p>
+</div>
+<div class="branch" id="vone-few" hidden>
+<p class="branchhead" data-draft>A few different values: a bar for each value</p>
 <p data-draft>In the gym, <code>classes</code> is the number of classes a member books each week, and it only takes five values: 0, 1, 2, 3 and 4. With this few values, we give every value its own bar. <code>value_counts()</code> counts the rows for each value, and <code>sort_index()</code> puts the bars in number order. Without it, the bars are sorted from the most common value to the least:</p>
 <div class="extra" data-draft><span class="tag">Interactive</span> Type a number column with only a few different values <input data-key="vfcol" value="classes">, then run the code below.</div>
 <div class="codebox"><button class="copy">Copy</button><pre data-code="{df}['{vfcol}'].value_counts().sort_index().plot(kind='bar')
@@ -126,6 +134,13 @@ plt.show()"></pre></div>
 </div>
 <p data-draft>Read the bar chart like a histogram: where do most of the rows sit, and is any value almost empty?</p>
 <p data-draft>In your report, say what the values stand for (here, classes per week), because a reader cannot tell a count from a 1 to 4 scale by looking at the chart.</p>
+</div>
+<div class="branch" id="vone-names" hidden>
+<p class="branchhead" data-draft>A few numbers that stand for names: treat the column as text</p>
+<p data-draft>To check, ask whether a bigger number means more of something. In the gym, 1 is the city centre branch, 2 is the campus and 3 is the retail park, so branch 3 is not more than branch 1. The numbers are names. A histogram or an average would treat them as amounts, so we draw the column the same way as a text column.</p>
+<p data-draft><a href="#q-vcat" data-jump="q-vcat">Open the text column question</a>, which shows the chart for the gym's <code>branch</code> column.</p>
+<p data-draft>There is one more case. If the number of different values is the same as the number of rows (<code>len(df)</code> gives the number of rows), the column is an ID that only labels the rows, and it does not need a chart.</p>
+</div>
 </div></div></section>
 
 
@@ -142,7 +157,7 @@ plt.show()"></pre></div>
 <p><code>value_counts()</code> sorts the bars from the most common category to the least, which makes the chart quick to read. Look for a category with very few rows, because anything you say about it later rests on those few rows.</p>
 <p>If the category names are long and hard to read on their side, change <code>kind='bar'</code> to <code>kind='barh'</code>, which draws the bars sideways and writes the names level.</p>
 <p>In your report, give the count or the share for each category you mention.</p>
-<p>The same chart is right for a number column whose numbers are names. In the gym, <code>branch</code> holds 1, 2 or 3, and each number is the name of a branch: branch 3 is not "more" than branch 1. A histogram or an average would treat the codes as amounts, so we count the rows for each code instead. Type the column into the box above, and run the same code:</p>
+<p>The same chart is right for a number column whose numbers are names. In the gym, <code>branch</code> holds 1, 2 or 3, and each number stands for a branch (1 is the city centre, 2 is the campus and 3 is the retail park), so branch 3 is not "more" than branch 1. A histogram or an average would treat the codes as amounts, so we count the rows for each code instead. Type the column into the box above, and run the same code:</p>
 <div class="figbox"><span class="olabel">Example output</span><img src="assets/vis_label.png" alt="A bar chart of the gym's branch codes: 5 members at branch 1, 3 at branch 2 and 2 at branch 3">
 <div class="figcap">In the 10-member gym, 5 members use branch 1, 3 use branch 2 and 2 use branch 3.</div></div>
 <p>Your reader will not know what code 1 means, so say what each code stands for in your report, or <a href="prepare.html#q-codes">swap the codes for names first, as the Prepare stage shows</a>.</p>
@@ -248,13 +263,14 @@ Name: proportion, dtype: float64</pre></div>
 <div class="extra" data-draft><span class="tag">Interactive</span> Type a number column <input data-key="vcol2" value="visits">, then run the code below.</div>
 <div class="codebox"><button class="copy">Copy</button><pre data-code="{df}['{vcol2}'].nunique()"></pre></div>
 <div class="outbox"><span class="olabel">Example output</span><pre class="o">15</pre></div>
-<p data-draft>In the 30-member gym, <code>visits</code> has 15 different values. Find the card below that matches your own column, and follow it.</p>
+<p data-draft>In the 30-member gym, <code>visits</code> has 15 different values. Find the card below that matches your own column, and open it.</p>
 <div class="typecards">
-<div class="dscard"><h3>Many different values</h3><p class="tvals"><code>visits</code>: 0, 1, 2, 3, … 14<br>15 different values</p><p data-draft>A measurement or a count. We draw one histogram for each answer, on the same axes.</p><p data-draft><a href="#vnum-many" data-jump="vnum-many">Histograms for each answer, below</a></p></div>
-<div class="dscard"><h3>A few different values</h3><p class="tvals"><code>classes</code>: 0, 1, 2, 3, 4<br>5 different values</p><p data-draft>Still an amount. We work out the share of one answer for each value, and draw a bar for each.</p><p data-draft><a href="#vnum-few" data-jump="vnum-few">The share for each value, below</a></p></div>
-<div class="dscard"><h3>A few values that are names</h3><p class="tvals"><code>branch</code>: 1, 2, 3<br>3 different values</p><p data-draft>Each number is the name of a branch, not an amount. We treat it as a text column.</p><p data-draft><a href="#q-vtext" data-jump="q-vtext">The text column question</a></p></div>
+<a class="dscard tcard" href="#vnum-many" data-branch="vnum-many" role="button" aria-expanded="false"><span class="chev">▾</span><h3>Many different values</h3><p class="tvals"><code>visits</code>: 0, 1, 2, 3, … 14<br>15 different values</p><p data-draft>A measurement or a count. We draw one histogram for each answer, on the same axes.</p></a>
+<a class="dscard tcard" href="#vnum-few" data-branch="vnum-few" role="button" aria-expanded="false"><span class="chev">▾</span><h3>A few different values</h3><p class="tvals"><code>classes</code>: 0, 1, 2, 3, 4<br>5 different values</p><p data-draft>About ten values or fewer, and still an amount. We draw the share of one answer for each value.</p></a>
+<a class="dscard tcard" href="#vnum-names" data-branch="vnum-names" role="button" aria-expanded="false"><span class="chev">▾</span><h3>A few numbers that stand for names</h3><p class="tvals"><code>branch</code>: 1, 2, 3<br>1 means city centre<br>2 means campus<br>3 means retail park<br>3 different values</p><p data-draft>The numbers are codes for the gym's branches, not amounts. We treat the column as text.</p></a>
 </div>
-<p class="branchhead" id="vnum-many" data-draft>Many different values: one histogram for each answer</p>
+<div class="branch" id="vnum-many" hidden>
+<p class="branchhead" data-draft>Many different values: one histogram for each answer</p>
 <p>One histogram for each answer, drawn on the same axes, shows whether the groups look different.</p>
 <p><code>sns.histplot</code> draws one histogram, and <code>hue</code> splits it into one set of bars for each answer, in its own colour, with the same bins for both, so that the two groups can be compared directly.</p>
 <div class="extra"><span class="tag">Interactive</span> Type a number column <input data-key="vcol2" value="visits">, then run the code below.</div>
@@ -269,7 +285,9 @@ plt.show()"></pre></div>
 <div class="figbox"><span class="olabel">Example output</span><img src="assets/vis_num_target_density.png" alt="The same two histograms of gym visits, each scaled to the same total area">
 <div class="figcap">The same gym, with each group scaled to the same area. The y axis now reads "Density" in place of a count.</div></div>
 <p>In your report, say what the chart shows about the two groups, and which later decision depends on it.</p>
-<p class="branchhead" id="vnum-few" data-draft>A few different values: the share of one answer for each value</p>
+</div>
+<div class="branch" id="vnum-few" hidden>
+<p class="branchhead" data-draft>A few different values: the share of one answer for each value</p>
 <p data-draft>With only a few different values, we work out the share of each answer for every value of the column. <code>pd.crosstab</code> counts the rows for every pair of a value and an answer, and <code>normalize='index'</code> turns each row of counts into shares. Then we draw the share for one answer:</p>
 <div class="extra" data-draft><span class="tag">Interactive</span> Type a number column with only a few different values <input data-key="vfcol" value="classes"> and the answer to follow, in quotes if it is a word <input data-key="vans" value="'yes'">, then run the code below.</div>
 <div class="codebox"><button class="copy">Copy</button><pre data-code="rate = pd.crosstab({df}['{vfcol}'], {df}['{target}'], normalize='index')
@@ -293,6 +311,12 @@ classes
 <p data-draft>The bars are already in number order, because <code>crosstab</code> sorts the values. A share that rises or falls steadily from left to right means that the column holds a signal about the answer.</p>
 <p data-draft>If you see <code>KeyError</code>, the answer in the square brackets is not spelt the way it is in your target column.</p>
 <p data-draft>A share worked out from only a few rows can swing a long way. Check how many rows each value has with <code>value_counts()</code> before you write about it: in the gym, the bar for four classes rests on only 4 members.</p>
+</div>
+<div class="branch" id="vnum-names" hidden>
+<p class="branchhead" data-draft>A few numbers that stand for names: treat the column as text</p>
+<p data-draft>To check, ask whether a bigger number means more of something. If it does not, the numbers are names, and we compare them with the target the same way as a text column: the share of each answer for each name.</p>
+<p data-draft><a href="#q-vtext" data-jump="q-vtext">Open the text column question</a>, which shows the chart.</p>
+</div>
 </div></div></section>
 
 
@@ -420,7 +444,12 @@ function pick(g, scroll){
   if(g && scroll) document.getElementById('layout').scrollIntoView({behavior:'smooth',block:'start'});
 }
 document.querySelectorAll('.panel').forEach(a=>a.addEventListener('click',e=>{ e.preventDefault(); pick(a.dataset.group,true); }));
-// card links: scroll to a part of the open question, or open another question in the same panel
+// type cards: each card opens its own branch under the cards, one at a time, and closes it when picked again
+document.querySelectorAll('.tcard').forEach(c=> c.addEventListener('click', e=>{ e.preventDefault();
+  const set=c.closest('.typecards'), opening=document.getElementById(c.dataset.branch).hidden;
+  set.querySelectorAll('.tcard').forEach(x=>{ const on = x===c && opening; x.classList.toggle('on', on); x.setAttribute('aria-expanded', on); document.getElementById(x.dataset.branch).hidden = !on; });
+  if(opening) setTimeout(()=> set.scrollIntoView({behavior:'smooth', block:'start'}), 60); }));
+// card links: open another question in the same panel
 document.querySelectorAll('a[data-jump]').forEach(a=> a.addEventListener('click', e=>{ e.preventDefault(); const t=document.getElementById(a.dataset.jump); if(!t) return;
   if(t.classList.contains('q')){ qs.forEach(o=>{ if(o!==t && o.classList.contains('open')) setOpen(o,false); }); setOpen(t,true); setTimeout(()=> t.scrollIntoView({behavior:'smooth', block:'start'}), 60); }
   else t.scrollIntoView({behavior:'smooth', block:'start'}); }));
