@@ -185,3 +185,6 @@ code{font-family:var(--mono);font-size:.9em;background:var(--purple-soft);color:
 
 /* Full-width text (19 Nov 2026): paragraphs, lists, taglines, code and output fill the page. Charts keep their own width. */
 .qinner p,.qinner ol.steps-list,.qhead .title small,.dsintro,.codebox,.outbox,.qinner pre.o{max-width:none}
+
+/* Module pill (19 Nov 2026): the filled purple CMM548 pill from the slides, for a question that the CMM548 coursework asks for */
+.modpill{display:inline-block;vertical-align:middle;margin-left:.35rem;position:relative;top:-.1em;font-size:.72rem;font-weight:700;letter-spacing:.05em;line-height:1.5;color:#fff;background:var(--purple);border-radius:999px;padding:.05rem .65rem;white-space:nowrap}
