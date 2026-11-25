@@ -1,0 +1,500 @@
+<!doctype html>
+<!--
+  Coursework Helper: Explain (stage 7), drafted 18 November 2026 for week 8.
+  Built on the design of this folder (style.css, and the same script as evaluate.html).
+  Every paragraph on this page is new wording. Open the page with ?review on the end of the address to shade it.
+  Example outputs were run on Bank Marketing, prepared as in the week 5 and week 6 labs, with scikit-learn 1.9.0
+  and shap 0.54.1, by generated/week8/scripts/helper_explain_figures.py. The model in the examples is
+  GradientBoostingClassifier(random_state=0), the model explained in the week 8 lab, and permutation importance is scored
+  with roc_auc as in the lab (changed 24 November 2026; before that the examples used a random forest and accuracy).
+  The weights question uses make_pipeline(MinMaxScaler(), LogisticRegression()).
+  Added 19 November 2026: q-whatif, q-standin and q-whatif-row, with example outputs from
+  generated/week8/scripts/helper_explain_figures_tour.py. The page as it was before is
+  generated/coursework_helper_backups/explain_before_19nov.html.
+  Added 24 November 2026: the CMM548 pill on the questions that only the CMM548 coursework asks for.
+-->
+<html lang="en-GB"><head><meta charset="utf-8"><meta name="viewport" content="width=device-width,initial-scale=1">
+<title>Explain · Coursework Helper</title>
+<link rel="stylesheet" href="https://fonts.googleapis.com/css2?family=Source+Sans+3:wght@400;600;700&family=Source+Code+Pro:wght@400;600&display=swap">
+<link rel="stylesheet" href="style.css">
+<style>
+  .figbox.small{max-width:30rem}
+  .figbox.mid{max-width:36rem}
+  body.review [data-draft]{background:#FFF6D6;box-shadow:0 0 0 3px #FFF6D6;border-radius:3px}
+</style>
+</head><body>
+<div class="topbar"></div>
+<div class="masthead"><a class="brand" href="index.html">Coursework Helper</a><span class="crumbs">› Stage 7 · Explain · Week 8</span>
+<div class="namesdock"><button class="namesbtn" id="namesbtn" aria-expanded="false">Your names: <code id="nm-df">df</code> · <code id="nm-target">target</code> <span class="chev">▾</span></button>
+<div class="namespanel" id="namespanel" hidden><p>Type the names from your own notebook once. Every code block on the page changes to match, and they are remembered on this computer.</p>
+<label>Your table <input data-key="df" value="df"></label><label>Your target column <input data-key="target" value="target"></label><label>Your trained model <input data-key="model" value="model"></label></div></div></div>
+<main class="wrap">
+<h1>Explain</h1>
+<div class="intro-text"><p>In the last stage, we measured how well our models guess. In this stage, we open a model up and check what it is using to make those guesses, so that we can decide whether we believe it. The explain stage can be broken into three core questions, which are the three sections below. The code on this page uses the names from the labs (<code>X_train</code>, <code>X_test</code>, <code>y_train</code> and <code>y_test</code>) and a model that you have already trained.</p></div>
+
+<div class="model" id="model">
+  <a class="panel" href="#g-columns" data-group="columns">
+    <svg viewBox="0 0 200 120" fill="none" stroke="#682773" stroke-width="2" stroke-linecap="round">
+      <path d="M44 12v96" stroke="#D8CDDD"/>
+      <rect x="44" y="18" width="118" height="16" rx="3" fill="#F9EBDD" stroke="#C9742C"/>
+      <rect x="44" y="42" width="62" height="16" rx="3" fill="#fff"/>
+      <rect x="44" y="66" width="36" height="16" rx="3" fill="#fff"/>
+      <rect x="44" y="90" width="14" height="16" rx="3" fill="#fff"/>
+    </svg>
+    <h2>Which columns are most important?</h2><p>Find the columns that matter most to the model across the whole test set, which is called a global explanation.</p>
+  </a>
+  <a class="panel" href="#g-one" data-group="one">
+    <svg viewBox="0 0 200 120" fill="none" stroke="#682773" stroke-width="2" stroke-linecap="round">
+      <path d="M30 104h140" stroke="#D8CDDD"/>
+      <path d="M150 20v84M62 20v84" stroke="#D8CDDD" stroke-dasharray="3 5"/>
+      <rect x="110" y="78" width="40" height="14" rx="3" fill="#fff"/>
+      <rect x="84" y="56" width="26" height="14" rx="3" fill="#fff"/>
+      <rect x="84" y="34" width="18" height="14" rx="3" fill="#F9EBDD" stroke="#C9742C"/>
+      <rect x="62" y="12" width="40" height="14" rx="3" fill="#fff"/>
+    </svg>
+    <h2>How do I explain a specific row?</h2><p>Take one row, and explain the guess the model made for it, which is called a local explanation.</p>
+  </a>
+  <a class="panel" href="#g-sense" data-group="sense">
+    <svg viewBox="0 0 200 120" fill="none" stroke="#682773" stroke-width="2" stroke-linecap="round">
+      <circle cx="88" cy="54" r="30" fill="#fff"/>
+      <path d="M110 76l28 28" stroke-width="5"/>
+      <path d="M74 55l10 10 18-22" stroke="#2E8B57" stroke-width="2.6"/>
+    </svg>
+    <h2>Does it make sense?</h2><p>Check what the model uses against what you know about the problem.</p>
+  </a>
+</div>
+
+<div id="layout">
+
+<!-- ============================================================ 1 -->
+<div class="group" id="g-columns" hidden>
+<p class="gintro">A score tells us how often the model is right, but it does not tell us what the model bases its guesses on. The questions below find the columns that are most important to the model across the whole test set. An explanation of the whole model like this is called a <b>global</b> explanation.</p>
+
+<section class="q" id="q-methods"><button class="qhead" aria-expanded="false"><span class="title">What methods can I use to find out which columns my model uses?<small>There are several methods, and which ones we can use depends on the model we trained.</small></span><span class="chev">▾</span></button>
+<div class="qbody"><div class="qinner">
+<p>A method that describes how the model behaves across the whole test set gives us a global explanation. We met six of them in week 8, and each one has its own question in this section.</p>
+<ol class="steps-list">
+<li><a href="#q-shuffle">Permutation importance</a> shuffles one column at a time, and measures how far the model's score falls. It works for any model, so it is the one to start with.</li>
+<li><a href="#q-builtin">Built-in feature importances</a> are a list that a decision tree, a random forest or a boosting model keeps from its training. They are quick to print, and only tree-based models have them.</li>
+<li><a href="#q-weights">Weights</a> (also called coefficients) are the numbers that logistic regression learns for each column. Only logistic regression has them.</li>
+<li>A <a href="#q-whatif">partial dependence plot</a> shows whether a higher value in one column raises or lowers the model's guesses. It works for any model.</li>
+<li>A <a href="#q-standin">global surrogate</a> is a small tree that we train to copy a model we cannot read, such as a forest, a boosting model, k-NN or an SVM.</li>
+<li>A <a href="#q-beeswarm">SHAP beeswarm plot</a> shows how far each column pushes the guesses for many rows at once. It works for any model, and the SHAP library has to be installed first.</li>
+</ol>
+<p>Permutation importance tells us which columns matter, and a partial dependence plot tells us which way one of them moves the guesses, so the two go well together. In your report, name the method you used, and say that it gives a global explanation.</p>
+</div></div></section>
+
+<section class="q" id="q-install"><button class="qhead" aria-expanded="false"><span class="title">How do I install SHAP? <span class="modpill" title="Asked for in the CMM548 coursework. Optional for CM3151.">CMM548</span><small>SHAP is a separate library, so we install it once before we can import it.</small></span><span class="chev">▾</span></button>
+<div class="qbody"><div class="qinner">
+<p>First, run this once, in its own cell. It can take a minute.</p>
+<div class="codebox"><button class="copy">Copy</button><pre data-code="%pip install shap"></pre></div>
+<p>Then restart the kernel (Kernel, then Restart), so that Python can see the new library, and run your notebook again from the top. Next, we import it:</p>
+<div class="codebox"><button class="copy">Copy</button><pre data-code="import shap"></pre></div>
+<p>Nothing prints when this works. If you see <code>ModuleNotFoundError: No module named 'shap'</code>, the install has not finished, or the kernel has not been restarted since.</p>
+</div></div></section>
+
+<section class="q" id="q-shuffle"><button class="qhead" aria-expanded="false"><span class="title">How do I run permutation importance?<small>Permutation importance (the shuffle test) scrambles one column at a time, and measures how far the model's score falls without it.</small></span><span class="chev">▾</span></button>
+<div class="qbody"><div class="qinner">
+<p>To find out how much the model depends on a column, we shuffle that column's values in the test set, so that they no longer sit on the right rows, and score the model again. If the score falls a long way, the model depends on that column. If the score hardly moves, the model can do without it. This is called permutation importance ("permute" means shuffle).</p>
+<p><code>permutation_importance</code> does this for every column in turn. <code>scoring='roc_auc'</code> names the score that we measure the drop in. We use the area under the ROC curve from the Evaluate stage, as in the week 8 lab, because a drop in accuracy is often too small to see. <code>n_repeats=5</code> shuffles each column five times and takes the average drop, because a single shuffle can be lucky.</p>
+<div class="extra"><span class="tag">Interactive</span> Type the name of your trained model <input data-key="model" value="model">, then run the code below.</div>
+<div class="codebox"><button class="copy">Copy</button><pre data-code="from sklearn.inspection import permutation_importance
+
+result = permutation_importance({model}, X_test, y_test, scoring='roc_auc', n_repeats=5, random_state=0)"></pre></div>
+<p>Nothing prints when this works. It scores the model five times for every column, so it can take a minute or two for a forest or k-NN (it took a few seconds for the model here). Next, we put the column names beside the drops and sort them, so that the column with the biggest drop is on top.</p>
+<div class="codebox"><button class="copy">Copy</button><pre data-code="drops = pd.Series(result.importances_mean, index=X_test.columns).sort_values(ascending=False)
+print(drops.head(10).round(3))"></pre></div>
+<div class="outbox"><span class="olabel">Example output</span><pre class="o">poutcome_success    0.022
+contact_unknown     0.019
+day_of_week         0.017
+month_jun           0.014
+contact_cellular    0.012
+month_apr           0.011
+month_mar           0.010
+balance             0.009
+month_oct           0.009
+month_nov           0.009
+dtype: float64</pre></div>
+<p>Each number is how far the score fell when that column was shuffled. In Bank Marketing, with a gradient boosting model whose area under the ROC curve is 0.797, shuffling <code>poutcome_success</code> lowers it by 0.022. <code>contact_unknown</code> (0.019) and <code>day_of_week</code> (0.017) are close behind. On your own data, look at which columns are at the top, and how far apart they are.</p>
+<p>If you encoded your text columns with <code>get_dummies</code>, each category has its own column here (<code>poutcome_success</code> is the <code>success</code> category of <code>poutcome</code>). A column with a drop of 0 is one the model can do without. A small negative number means the score happened to rise a little when the column was shuffled, so read it as 0.</p>
+<p><code>'roc_auc'</code> works when your target has two answers. If it has more than two, you will see <code>ValueError: multi_class must be in ('ovo', 'ovr')</code>, so use <code>scoring='roc_auc_ovr'</code> instead. To measure the drop in the score you chose in the Evaluate stage, put its name there, for example <code>scoring='f1_macro'</code>.</p>
+</div></div></section>
+
+<section class="q" id="q-bar"><button class="qhead" aria-expanded="false"><span class="title">How do I show permutation importance as a chart?<small>A bar chart of the drops lets a reader compare the columns at a glance.</small></span><span class="chev">▾</span></button>
+<div class="qbody"><div class="qinner">
+<p>We draw the ten biggest drops as horizontal bars, so that the column names are easy to read. This uses <code>drops</code> from the question above. <code>.sort_values()</code> puts the longest bar at the top of the chart.</p>
+<div class="codebox"><button class="copy">Copy</button><pre data-code="drops.head(10).sort_values().plot.barh()
+plt.xlabel('Drop in score when the column is shuffled')
+plt.show()"></pre></div>
+<div class="figbox small"><span class="olabel">Example output</span><img src="assets/explain_importance_bar.png" alt="A horizontal bar chart of the ten biggest drops for gradient boosting on Bank Marketing. The bar for poutcome_success reaches 0.022, contact_unknown 0.019, day_of_week 0.017 and month_jun 0.014, and the other six are between 0.009 and 0.012."></div>
+<p>There is one bar for each column, and the length of the bar is how far the score fell when that column was shuffled. The longest bar is the column that is most important to the model. On your own chart, look for whether one or two bars stand apart from the rest, or whether the drops are spread evenly.</p>
+<p>If you see <code>NameError: name 'drops' is not defined</code>, run both code blocks of the question above first. In your report, give the chart a caption that names the model, and say in words which columns come out on top.</p>
+</div></div></section>
+
+<section class="q" id="q-builtin"><button class="qhead" aria-expanded="false"><span class="title">Is there a quicker way for trees, forests and boosting?<small>Tree-based models keep their own list of how much each column helped while they trained.</small></span><span class="chev">▾</span></button>
+<div class="qbody"><div class="qinner">
+<p>A decision tree, a random forest and a boosting model each keep a number for every column, which measures how much that column's questions helped to separate the answers during training. It is already worked out, so it appears straight away.</p>
+<div class="codebox"><button class="copy">Copy</button><pre data-code="built_in = pd.Series({model}.feature_importances_, index=X_train.columns).sort_values(ascending=False)
+print(built_in.head(10).round(3))"></pre></div>
+<div class="outbox"><span class="olabel">Example output</span><pre class="o">poutcome_success    0.378
+age                 0.081
+pdays               0.072
+month_mar           0.047
+day_of_week         0.044
+contact_unknown     0.043
+month_apr           0.042
+month_jun           0.039
+month_oct           0.039
+housing_yes         0.032
+dtype: float64</pre></div>
+<p>These numbers are shares that add up to 1 across all the columns. In Bank Marketing, both lists put <code>poutcome_success</code> first, and they disagree below it. This list puts <code>age</code> and <code>pdays</code> next, while permutation importance put <code>contact_unknown</code> and <code>day_of_week</code> next.</p>
+<p>The two can disagree because the built-in number favours columns with many different values, which give a tree more places to ask a question. In our training set, <code>age</code> has 77 different values and <code>contact_unknown</code> has two. The built-in number also comes from the training rows only, while permutation importance uses rows the model has not seen. So we use this list as a quick first look, and permutation importance for the report. If your two lists disagree, say so in your report.</p>
+<p>If you see <code>AttributeError: ... has no attribute 'feature_importances_'</code>, your model is not tree-based (k-NN, SVM, Naive Bayes and logistic regression do not have this list), so use permutation importance.</p>
+</div></div></section>
+
+<section class="q" id="q-weights"><button class="qhead" aria-expanded="false"><span class="title">How do I read logistic regression's weights?<small>Logistic regression learns one weight for each column, and the sign of the weight says which answer the column pushes towards.</small></span><span class="chev">▾</span></button>
+<div class="qbody"><div class="qinner">
+<p>Logistic regression multiplies each column by a weight and adds the results up. A positive weight pushes the guess towards the second answer in <code>classes_</code>, and a negative weight pushes it towards the first. The weights are kept in <code>coef_</code>. In the labs, our logistic regression sits inside a pipeline with a scaler, and <code>[-1]</code> picks out the last step of the pipeline, which is the model itself.</p>
+<div class="extra"><span class="tag">Interactive</span> Type the name of your trained logistic regression <input data-key="model" value="model">, then run the code below.</div>
+<div class="codebox"><button class="copy">Copy</button><pre data-code="print({model}.classes_)
+
+weights = pd.Series({model}[-1].coef_[0], index=X_train.columns).sort_values()
+print(weights.head(5).round(2))
+print(weights.tail(5).round(2))"></pre></div>
+<div class="outbox"><span class="olabel">Example output</span><pre class="o">['no' 'yes']
+campaign           -3.80
+contact_unknown    -0.97
+month_jan          -0.93
+poutcome_failure   -0.81
+month_aug          -0.80
+dtype: float64
+month_dec           0.73
+month_oct           0.76
+month_mar           1.09
+balance             1.20
+poutcome_success    1.42
+dtype: float64</pre></div>
+<p>The first list is the five most negative weights, and the second is the five most positive. In Bank Marketing, the second answer is <code>yes</code>, so <code>poutcome_success</code> (1.42) pushes hardest towards "yes", and <code>campaign</code> (−3.80) pushes hardest towards "no".</p>
+<p>The sizes of the weights can only be compared when the columns are on the same scale, which is one more reason the scaler is in the pipeline. If your logistic regression is not in a pipeline, take out the <code>[-1]</code>. If your target has more than two answers, <code>coef_</code> has one row of weights for each answer, and <code>[0]</code> is the row for the first answer in <code>classes_</code>.</p>
+</div></div></section>
+
+<section class="q" id="q-whatif"><button class="qhead" aria-expanded="false"><span class="title">How do I see whether a column raises or lowers my model's guesses? <span class="modpill" title="Asked for in the CMM548 coursework. Optional for CM3151.">CMM548</span><small>A partial dependence plot changes one column for every row, and shows how the average guess moves as that column's value goes up.</small></span><span class="chev">▾</span></button>
+<div class="qbody"><div class="qinner">
+<p>Permutation importance tells us that a column is important to the model. It does not tell us whether a higher value in that column raises or lowers the guess. To see that, we take some rows from the test set, change only one column, and ask the model to guess again for each value. Everything else about each row stays as it was.</p>
+<p>First, we take 200 test rows, because the plot draws one line for every row and more than that is hard to read. <code>.astype(float)</code> turns every column into decimal numbers, which this plot needs.</p>
+<div class="extra"><span class="tag">Interactive</span> Type the name of your trained model <input data-key="model" value="model"> and the column you want to change <input data-key="whatcol" value="age">, then run the code below.</div>
+<div class="codebox"><button class="copy">Copy</button><pre data-code="from sklearn.inspection import PartialDependenceDisplay
+
+sample = X_test.sample(200, random_state=0).astype(float)
+
+print({model}.classes_)
+PartialDependenceDisplay.from_estimator({model}, sample, ['{whatcol}'], kind='both')
+plt.show()"></pre></div>
+<div class="outbox"><span class="olabel">Example output</span><pre class="o">['no' 'yes']</pre></div>
+<div class="figbox mid"><span class="olabel">Example output</span><img src="assets/explain_whatif.png" alt="A plot with age from 23 to 82 along the bottom and a chance from 0 to 0.9 up the side. About 200 thin lines run across it, most of them low and flat between 30 and 60, and stepping up at 60. A dashed average line starts near 0.17 at age 23, falls to about 0.11 by 30, stays there until 60, then steps up to about 0.2 and reaches about 0.27 by 80."></div>
+<p>Along the bottom is the value we pretend the column has. Up the side is the model's chance of the second answer in <code>classes_</code> ("yes" here), on the axis that scikit-learn labels "Partial dependence". Each thin line is one row, and the dashed line is the average of them all. The small black marks along the bottom show where the real values of the column are.</p>
+<p>In Bank Marketing, the average chance of "yes" is about 0.11 for clients between 30 and 60. It rises to about 0.20 just after 60 and to about 0.27 by 75, and it is higher for the youngest clients too (0.17 at 25). So the model has learned that the youngest and the oldest clients say yes more often. On your own plot, look at whether the dashed line rises, falls or stays flat, and whether the thin lines follow the same shape or go their own way.</p>
+<p>The dashed average line is the partial dependence plot, and the thin lines are called ICE lines (individual conditional expectation). A plot like this is sometimes called a "what if" plot. In your report, say which column you changed, which way the average line moves, and whether that direction is what you would expect.</p>
+<p>If you see <code>ValueError: The column 0 contains integer data</code>, the table went in without <code>.astype(float)</code>. If you see <code>ValueError: Feature ... not in feature_names</code>, the column name is not spelled as it is in <code>X_test.columns</code>. If you see <code>ValueError: target must be specified for multi-class</code>, your target has more than two answers, so choose one of the answers in <code>classes_</code> and add it as <code>target=</code>, for example <code>kind='both', target={model}.classes_[0]</code>.</p>
+</div></div></section>
+
+<section class="q" id="q-standin"><button class="qhead" aria-expanded="false"><span class="title">How do I explain complex models, such as ensembles? <span class="modpill" title="Asked for in the CMM548 coursework. Optional for CM3151.">CMM548</span><small>A small tree trained to copy the model's guesses is called a global surrogate, and it gives us rules that we can read.</small></span><span class="chev">▾</span></button>
+<div class="qbody"><div class="qinner">
+<p>A forest, gradient boosting, k-NN and the SVM cannot be read directly. A tree with two questions can. So we train a small tree to predict our model's guesses, and then read the small tree as a description of the model. The small tree never sees the real answers, because it only learns what our model would say.</p>
+<div class="extra"><span class="tag">Interactive</span> Type the name of your trained model <input data-key="model" value="model">, then run the code below.</div>
+<div class="codebox"><button class="copy">Copy</button><pre data-code="from sklearn.tree import DecisionTreeClassifier, export_text
+
+guesses = {model}.predict(X_train)
+
+standin = DecisionTreeClassifier(max_depth=2, random_state=0)
+standin.fit(X_train, guesses)
+print(export_text(standin, feature_names=list(X_train.columns)))"></pre></div>
+<div class="outbox"><span class="olabel">Example output</span><pre class="o">|--- poutcome_success &lt;= 0.50
+|   |--- month_mar &lt;= 0.50
+|   |   |--- class: no
+|   |--- month_mar &gt;  0.50
+|   |   |--- class: no
+|--- poutcome_success &gt;  0.50
+|   |--- housing_yes &lt;= 0.50
+|   |   |--- class: yes
+|   |--- housing_yes &gt;  0.50
+|   |   |--- class: no</pre></div>
+<p>Each line that starts with <code>|---</code> is a question, and each <code>class:</code> line is the guess for the rows that reach it. In Bank Marketing, both branches under <code>poutcome_success &lt;= 0.50</code> end in "no". Under <code>poutcome_success &gt; 0.50</code>, the guess is "yes" when <code>housing_yes</code> is 0, and "no" when it is 1. So the whole small tree says that the model guesses "yes" when the client said yes to the last campaign and has no housing loan, and "no" otherwise.</p>
+<p>A copy is only useful if it behaves like the model, so next we count how often the two give the same guess on the test set, and where they differ:</p>
+<div class="codebox"><button class="copy">Copy</button><pre data-code="test_guesses = {model}.predict(X_test)
+standin_guesses = standin.predict(X_test)
+
+print((standin_guesses == test_guesses).mean().round(3))
+print(pd.crosstab(test_guesses, standin_guesses, rownames=['model'], colnames=['stand-in']))"></pre></div>
+<div class="outbox"><span class="olabel">Example output</span><pre class="o">0.985
+stand-in     no  yes
+model               
+no        13029    9
+yes         199  327</pre></div>
+<p>The first number is the share of test rows where the small tree and the model agree. In the table, each row is what our model guessed, and each column is what the small tree guessed. In Bank Marketing they agree on 0.985 of the clients, which sounds very close. The bottom row shows the weak spot. Our model says "yes" for 526 clients, and the small tree matches only 327 of them. Most guesses are "no", so agreeing on those is easy.</p>
+<p>In your report, give the small tree's rule in words, and always give the agreement beside it, including how well it agrees on the answer you care about. This kind of copy is called a global surrogate model. To let the small tree ask one more question in a row, change <code>max_depth=2</code> to <code>max_depth=3</code>. The rule gets longer, and the agreement usually rises.</p>
+<p>If you see <code>NameError: name 'standin' is not defined</code>, run the first code block of this question first.</p>
+</div></div></section>
+
+<section class="q" id="q-beeswarm"><button class="qhead" aria-expanded="false"><span class="title">How do I use SHAP to see which columns matter across all my rows? <span class="modpill" title="Asked for in the CMM548 coursework. Optional for CM3151.">CMM548</span><small>A SHAP beeswarm plot draws one dot for every row in every column, so that we can see which columns push the guesses furthest.</small></span><span class="chev">▾</span></button>
+<div class="qbody"><div class="qinner">
+<p>SHAP is a library that takes one row at a time. It starts from the model's average chance across a sample of rows, and works out how far each column's value pushed the chance for that row up or down. A beeswarm plot draws those pushes for many rows together, so that we can see the pattern across the test set.</p>
+<p>First, install SHAP (see <a href="#q-install">"How do I install SHAP?"</a>). Then we give SHAP 100 training rows to work out the starting chance from. <code>.astype(float)</code> turns any True and False columns into 1 and 0, which SHAP needs.</p>
+<div class="extra"><span class="tag">Interactive</span> Type the name of your trained model <input data-key="model" value="model">, then run the code below.</div>
+<div class="codebox"><button class="copy">Copy</button><pre data-code="background = X_train.sample(100, random_state=0).astype(float)
+explainer = shap.Explainer({model}.predict_proba, background)"></pre></div>
+<p>Next, we ask for the pushes on a sample of 200 test rows, and draw them together. It took a few seconds for the model here. It is slower for a forest or k-NN, and for larger samples.</p>
+<div class="codebox"><button class="copy">Copy</button><pre data-code="rows = X_test.sample(200, random_state=0).astype(float)
+many_values = explainer(rows)
+
+shap.plots.beeswarm(many_values[:, :, 1])"></pre></div>
+<div class="figbox mid"><span class="olabel">Example output</span><img src="assets/explain_beeswarm.png" alt="A SHAP beeswarm plot for 200 Bank Marketing clients. The top rows are poutcome_success, contact_cellular, contact_unknown, month_jun, housing_yes, age, day_of_week, balance and marital_married. For poutcome_success most dots are blue and sit on the centre line, and a few red dots sit far to the right, between 0.3 and 0.4. For contact_cellular the red dots sit to the right of the centre line and the blue dots to the left. For contact_unknown the red dots sit to the left."></div>
+<p>There is one line for each column, and one dot for each row. A dot to the right of the centre line means that column pushed that row's chance up, and a dot to the left means it pushed the chance down. The colour is the row's value in that column, where red is high and blue is low (for a yes-or-no column, red is 1 and blue is 0). The columns with the biggest pushes on average are at the top.</p>
+<p>In Bank Marketing, the top line is <code>poutcome_success</code>. Its few red dots, the clients who said yes to the last campaign, sit far to the right, so that value pushes the chance of "yes" up by 0.3 to 0.4. The red dots for <code>contact_unknown</code> sit to the left, so that value pushes the chance down. On your own plot, pick the top two or three lines, and say which way a high value pushes.</p>
+<p>In <code>many_values[:, :, 1]</code>, the <code>1</code> is the second answer in <code>classes_</code> (counting starts at 0). To draw the plot for a different answer, change that number.</p>
+<p>This plot and permutation importance can put the columns in a different order, because they measure different things. Permutation importance measures what the score depends on, and this plot measures how far the guesses move. In your report, name the top two or three columns, and say which way a high value pushes the guess.</p>
+<p>If you see <code>TypeError: ufunc 'isfinite' not supported for the input types</code>, a table went in without <code>.astype(float)</code>. If you see <code>AttributeError: This 'SVC' has no attribute 'predict_proba'</code>, your SVM was trained without chances, so train it again with <code>SVC(probability=True)</code>.</p>
+</div></div></section>
+</div>
+
+<!-- ============================================================ 2 -->
+<div class="group" id="g-one" hidden>
+<p class="gintro">The questions in the first section describe the model across the whole test set. The questions below take one row, and explain the guess the model made for that row. This is called a <b>local</b> explanation.</p>
+
+<section class="q" id="q-methods-row"><button class="qhead" aria-expanded="false"><span class="title">What methods can I use to explain one row? <span class="modpill" title="Asked for in the CMM548 coursework. Optional for CM3151.">CMM548</span><small>Some of these methods work for any model, and others need a tree or the SHAP library.</small></span><span class="chev">▾</span></button>
+<div class="qbody"><div class="qinner">
+<p>A method that explains the guess the model made for one row gives us a local explanation. We met four of them in week 8, and each one has its own question in this section.</p>
+<ol class="steps-list">
+<li><a href="#q-treepath">Reading a decision tree</a> for one row lists the yes/no questions that the row answered on its way to the guess. It only works when the model is a single decision tree.</li>
+<li>A <a href="#q-whatif-row">counterfactual</a> is the smallest change to the row that makes the model give a different answer. It works for any model, and nothing needs installing.</li>
+<li>A <a href="#q-rowline">ceteris paribus plot</a> draws how the guess for the row moves as one of its values changes. It works for any model, and nothing needs installing.</li>
+<li>A <a href="#q-waterfall">SHAP waterfall plot</a> shows how far each column pushed the guess for the row up or down. It works for any model, and the SHAP library has to be installed first.</li>
+</ol>
+<p>Every one of these methods starts from a row, so begin with <a href="#q-choose">"How do I choose a row to explain?"</a>. In your report, name the method you used, and say that it gives a local explanation.</p>
+</div></div></section>
+
+<section class="q" id="q-install-row"><button class="qhead" aria-expanded="false"><span class="title">How do I install SHAP? <span class="modpill" title="Asked for in the CMM548 coursework. Optional for CM3151.">CMM548</span><small>SHAP is a separate library, so we install it once before we can import it.</small></span><span class="chev">▾</span></button>
+<div class="qbody"><div class="qinner">
+<p>First, run this once, in its own cell. It can take a minute.</p>
+<div class="codebox"><button class="copy">Copy</button><pre data-code="%pip install shap"></pre></div>
+<p>Then restart the kernel (Kernel, then Restart), so that Python can see the new library, and run your notebook again from the top. Next, we import it:</p>
+<div class="codebox"><button class="copy">Copy</button><pre data-code="import shap"></pre></div>
+<p>Nothing prints when this works. If you see <code>ModuleNotFoundError: No module named 'shap'</code>, the install has not finished, or the kernel has not been restarted since.</p>
+</div></div></section>
+
+<section class="q" id="q-choose"><button class="qhead" aria-expanded="false"><span class="title">How do I choose a row to explain? <span class="modpill" title="Asked for in the CMM548 coursework. Optional for CM3151.">CMM548</span><small>We can pick a row by its position in the test set, or look for one that the model got wrong.</small></span><span class="chev">▾</span></button>
+<div class="qbody"><div class="qinner">
+<p>Every method in this section explains one row, so first we choose that row and give it the name <code>row</code>. The simplest choice is a position in the test set, where 0 is the first row. <code>.astype(float)</code> turns any True and False columns into 1 and 0, which some of the methods need. We also print the model's chances and its guess for the row, and then the real answer, so that we know what we are explaining.</p>
+<div class="extra"><span class="tag">Interactive</span> Type the name of your trained model <input data-key="model" value="model"> and the position of the row you want to explain <input data-key="rownum" value="0">, then run the code below.</div>
+<div class="codebox"><button class="copy">Copy</button><pre data-code="row = X_test.iloc[[{rownum}]].astype(float)
+
+print({model}.classes_)
+print({model}.predict_proba(row).round(2))
+print({model}.predict(row))
+print(y_test.loc[row.index])"></pre></div>
+<div class="outbox"><span class="olabel">Example output</span><pre class="o">['no' 'yes']
+[[0.95 0.05]]
+['no']
+3893    no
+Name: y, dtype: str</pre></div>
+<p>The chances are in the order of <code>classes_</code>. In Bank Marketing, the model gives the first test client a 0.05 chance of "yes", so its guess is "no". The last lines show that this client really said no (3893 is the client's row label in the full table).</p>
+<p>A wrong guess often tells us more about the model than a right one. To find one, we ask the model for its guess on every test row, and keep the rows where the guess and the real answer differ.</p>
+<div class="codebox"><button class="copy">Copy</button><pre data-code="guesses = {model}.predict(X_test)
+wrong = X_test[guesses != y_test]
+
+print(len(wrong))"></pre></div>
+<div class="outbox"><span class="olabel">Example output</span><pre class="o">1447</pre></div>
+<p>In Bank Marketing, the model gets 1,447 of the 13,564 test rows wrong. Next, we make the first of them our <code>row</code>, and check what its real answer was.</p>
+<div class="codebox"><button class="copy">Copy</button><pre data-code="row = wrong.iloc[[0]].astype(float)
+print(y_test.loc[row.index])"></pre></div>
+<div class="outbox"><span class="olabel">Example output</span><pre class="o">21225    yes
+Name: y, dtype: str</pre></div>
+<p>This client really said yes, and the model guessed "no". To look at a different wrong guess, change the <code>0</code> in <code>wrong.iloc[[0]]</code>. In your report, say which row you chose and why, what the model guessed for it, and what the real answer was.</p>
+</div></div></section>
+
+<section class="q" id="q-treepath"><button class="qhead" aria-expanded="false"><span class="title">How do I read a decision tree for one single row? <span class="modpill" title="Asked for in the CMM548 coursework. Optional for CM3151.">CMM548</span><small>A decision tree sends a row down one path of yes/no questions, and we can print the questions that our row answered.</small></span><span class="chev">▾</span></button>
+<div class="qbody"><div class="qinner">
+<p>A decision tree makes its guess by asking a row a short list of yes/no questions, one after another. So when our model is a decision tree, the explanation of one guess is the list of questions that the row answered. A forest or a boosting model is made of many trees, so for those we use the other questions in this section.</p>
+<p><code>decision_path</code> gives us the places in the tree that our row passed through. For each one, we print the column that the tree asked about, the row's value in that column, and the number that the tree compared it with. This uses <code>row</code> from <a href="#q-choose">"How do I choose a row to explain?"</a>.</p>
+<div class="extra"><span class="tag">Interactive</span> Type the name of your trained decision tree <input data-key="model" value="model">, then run the code below.</div>
+<div class="codebox"><button class="copy">Copy</button><pre data-code="print({model}.classes_)
+for node in {model}.decision_path(row).indices:
+    column = {model}.tree_.feature[node]
+    if column < 0:
+        print('The guess is', {model}.predict(row)[0], {model}.predict_proba(row)[0].round(2))
+    else:
+        name = X_test.columns[column]
+        print(name, 'is', row[name].values[0], 'and the tree asks whether it is at most', {model}.tree_.threshold[node].round(2))"></pre></div>
+<div class="outbox"><span class="olabel">Example output</span><pre class="o">['no' 'yes']
+poutcome_success is 0.0 and the tree asks whether it is at most 0.5
+age is 41.0 and the tree asks whether it is at most 60.5
+contact_unknown is 1.0 and the tree asks whether it is at most 0.5
+month_oct is 0.0 and the tree asks whether it is at most 0.5
+month_nov is 0.0 and the tree asks whether it is at most 0.5
+The guess is no [0.96 0.04]</pre></div>
+<p>Each line is one question, in the order that the tree asked them. When the row's value is at most the tree's number, the row takes one branch, and when it is bigger, the row takes the other. The last line is the tree's guess, followed by its chance for each answer in the order of <code>classes_</code>.</p>
+<p>In Bank Marketing, we trained a decision tree with <code>max_depth=5</code>, so it asks five questions. This client did not say yes to the last campaign (<code>poutcome_success</code> is 0), is 41, which is below the tree's cut at 60.5, and was contacted in a way that was not recorded (<code>contact_unknown</code> is 1). The call was not made in October or November. The tree guesses "no" for every client who gives these five answers, with a 0.04 chance of "yes".</p>
+<p>A tree that was trained without a limit on its depth can ask a very long list of questions (see <a href="build.html#q-depth">"How do I stop my tree from memorising?"</a> in the Build stage). In your report, give the questions that your row answered in words, and say whether they are sensible reasons for the guess.</p>
+<p>If you see <code>AttributeError: ... has no attribute 'decision_path'</code> or <code>AttributeError: 'tuple' object has no attribute 'indices'</code>, your model is not a single decision tree. If you see <code>NameError: name 'row' is not defined</code>, run the code in <a href="#q-choose">"How do I choose a row to explain?"</a> first.</p>
+</div></div></section>
+
+<section class="q" id="q-whatif-row"><button class="qhead" aria-expanded="false"><span class="title">How do I find out what would change my model's guess for a row? <span class="modpill" title="Asked for in the CMM548 coursework. Optional for CM3151.">CMM548</span><small>A counterfactual is the smallest change to a row that makes the model give a different answer.</small></span><span class="chev">▾</span></button>
+<div class="qbody"><div class="qinner">
+<p>One way to explain a guess is to ask what would have made it different. We take our row, change one of its values, and ask the model for its chances again. A change that makes the model give a different answer is called a counterfactual. This works for any model, and nothing needs installing.</p>
+<p>First, we look at the value that our row really has in the column we are going to change. This uses <code>row</code> from <a href="#q-choose">"How do I choose a row to explain?"</a>.</p>
+<div class="extra"><span class="tag">Interactive</span> Type the column you want to change <input data-key="whatcol" value="age">, then run the code below.</div>
+<div class="codebox"><button class="copy">Copy</button><pre data-code="print(row['{whatcol}'].values)"></pre></div>
+<div class="outbox"><span class="olabel">Example output</span><pre class="o">[41.]</pre></div>
+<p>Next, we try several other values in a loop. Each time, we copy the row, change that one column, and print the model's chances. The numbers in the square brackets are the values to try, so replace them with values that make sense for your own column.</p>
+<div class="extra"><span class="tag">Interactive</span> Type the name of your trained model <input data-key="model" value="model">, then run the code below.</div>
+<div class="codebox"><button class="copy">Copy</button><pre data-code="print({model}.classes_)
+for value in [20, 30, 40, 50, 60, 70, 80]:
+    what_if = row.copy()
+    what_if['{whatcol}'] = value
+    print(value, {model}.predict_proba(what_if)[0].round(2))"></pre></div>
+<div class="outbox"><span class="olabel">Example output</span><pre class="o">['no' 'yes']
+20 [0.93 0.07]
+30 [0.95 0.05]
+40 [0.95 0.05]
+50 [0.95 0.05]
+60 [0.94 0.06]
+70 [0.83 0.17]
+80 [0.83 0.17]</pre></div>
+<p>Each line is the value we tried, then the chance of each answer, in the order of <code>classes_</code>. The model's guess is the answer with the bigger chance, so the guess flips where the bigger number changes sides.</p>
+<p>In Bank Marketing, this client is 41, and the model gives them a 0.05 chance of "yes". Changing their age moves that chance, to 0.07 at 20 and 0.17 at 70, but "no" stays the bigger number at every age we tried. So age alone would not have changed the guess for this client. That is a finding too, because it tells us that the model's "no" for this client does not rest on their age.</p>
+<p>When the guess does flip, we can explain it in one sentence, such as "if this value had been … instead of …, the model would have guessed …". This is called a counterfactual explanation. In your report, say which column you changed, the value where the guess flips (or that it never does), and whether a change like that could really happen.</p>
+<p>If you see <code>NameError: name 'row' is not defined</code>, run the code in <a href="#q-choose">"How do I choose a row to explain?"</a> first. If you see <code>KeyError</code> with your column's name, the name is not spelled as it is in <code>X_test.columns</code>. For a column that holds True and False, try the values <code>[0, 1]</code>.</p>
+</div></div></section>
+
+<section class="q" id="q-rowline"><button class="qhead" aria-expanded="false"><span class="title">How do I see how the guess for my row changes with one column? <span class="modpill" title="Asked for in the CMM548 coursework. Optional for CM3151.">CMM548</span><small>A ceteris paribus plot changes one value in our row and keeps everything else the same, so that we can see how the guess moves.</small></span><span class="chev">▾</span></button>
+<div class="qbody"><div class="qinner">
+<p>The question above tried a few values by hand. To see all of them at once, we draw the model's chance for our row as a line. This is called a ceteris paribus plot ("ceteris paribus" is Latin for "all else being equal"), because only one value changes and the rest of the row stays as it was. It is one of the thin lines from the <a href="#q-whatif">partial dependence plot</a>, drawn for the row we chose.</p>
+<p>First, we list every value that the column takes in the test set. Then we make one copy of our row for each value, change only that column in each copy, and ask the model for its chance of the second answer in <code>classes_</code>. This uses <code>row</code> from <a href="#q-choose">"How do I choose a row to explain?"</a>.</p>
+<div class="extra"><span class="tag">Interactive</span> Type the name of your trained model <input data-key="model" value="model"> and the column you want to change <input data-key="whatcol" value="age">, then run the code below.</div>
+<div class="codebox"><button class="copy">Copy</button><pre data-code="values = sorted(X_test['{whatcol}'].unique())
+what_if = pd.concat([row] * len(values))
+what_if['{whatcol}'] = values
+chances = {model}.predict_proba(what_if)[:, 1]
+
+plt.plot(values, chances)
+plt.axvline(row['{whatcol}'].values[0], linestyle='--')
+plt.xlabel('{whatcol}')
+plt.ylabel('Chance of ' + str({model}.classes_[1]))
+plt.show()"></pre></div>
+<div class="figbox mid"><span class="olabel">Example output</span><img src="assets/explain_row_line.png" alt="A line plot with age from 18 to 93 along the bottom and the chance of yes from 0.05 to 0.30 up the side. The line starts at about 0.07, falls to 0.05 by age 31 and stays flat until 57. It climbs steeply between 60 and 64 to 0.17, stays there until 80, then steps up to 0.30 by 92. A dashed vertical line marks age 41."></div>
+<p>Along the bottom is the value we pretend the column has, and up the side is the model's chance for our row. The dashed line marks the value that our row really has.</p>
+<p>In Bank Marketing, this client is 41, where the chance of "yes" is at its lowest (0.05). The same client would get about 0.07 at 20, and the line climbs steeply just after 60, to 0.17 at 65 and 0.30 at 92. The line never reaches 0.5, so there is no age at which the model would guess "yes" for this client.</p>
+<p>On your own plot, look for where the line is steep, because that is where a small change in the value moves the guess most. The line belongs to this one row, and another row can have a different shape. In your report, say which row and column you used, where the chance changes most, and whether the line crosses 0.5.</p>
+<p>If you see <code>KeyError</code> with your column's name, the name is not spelled as it is in <code>X_test.columns</code>. A column that holds True and False has only two values, so its line is drawn between two points. If you see <code>NameError: name 'row' is not defined</code>, run the code in <a href="#q-choose">"How do I choose a row to explain?"</a> first.</p>
+</div></div></section>
+
+<section class="q" id="q-waterfall"><button class="qhead" aria-expanded="false"><span class="title">How do I draw a SHAP waterfall for my row? <span class="modpill" title="Asked for in the CMM548 coursework. Optional for CM3151.">CMM548</span><small>A waterfall plot starts from the model's average guess, and shows how each column pushes the guess for one row.</small></span><span class="chev">▾</span></button>
+<div class="qbody"><div class="qinner">
+<p>SHAP starts from the model's average chance across a sample of rows, which is its guess when it knows nothing about this row. It then works out how far each column's value pushed the chance up or down, so that the pushes add up to the model's chance for the row.</p>
+<p>First, install SHAP (see <a href="#q-install-row">"How do I install SHAP?"</a>). Then we give SHAP 100 training rows to work out the starting chance from. <code>.astype(float)</code> turns any True and False columns into 1 and 0, which SHAP needs.</p>
+<div class="extra"><span class="tag">Interactive</span> Type the name of your trained model <input data-key="model" value="model">, then run the code below.</div>
+<div class="codebox"><button class="copy">Copy</button><pre data-code="background = X_train.sample(100, random_state=0).astype(float)
+explainer = shap.Explainer({model}.predict_proba, background)"></pre></div>
+<p>Next, we ask for the pushes on <code>row</code>, the row we chose in <a href="#q-choose">"How do I choose a row to explain?"</a>. We print <code>classes_</code> as well, so that we know which answer the plot is about.</p>
+<div class="codebox"><button class="copy">Copy</button><pre data-code="shap_values = explainer(row)
+
+print({model}.classes_)
+shap.plots.waterfall(shap_values[0, :, 1])"></pre></div>
+<div class="outbox"><span class="olabel">Example output</span><pre class="o">['no' 'yes']</pre></div>
+<div class="figbox mid"><span class="olabel">Example output</span><img src="assets/explain_waterfall.png" alt="A SHAP waterfall plot for one Bank Marketing client. It starts at 0.098 at the bottom and ends at 0.051 at the top. The two longest bars are blue and point left: contact_cellular of 0 gives minus 0.02, and contact_unknown of 1 gives minus 0.02. Below them, housing_yes and age give minus 0.01 each, and two red bars, marital_married and day_of_week, give plus 0.01 each. 42 other features together give minus 0.01."></div>
+<p>Read the plot from the bottom to the top. It starts at <code>E[f(X)]</code>, the average chance across our 100 sample rows (0.098 for "yes" here). Each bar is one column's push. A blue bar pushes the chance down, and a red bar pushes it up. The grey number beside each name is this row's value in that column. The plot ends at <code>f(x)</code> at the top, which is the model's chance for this row.</p>
+<p>In Bank Marketing, the model gives this client a 0.05 chance of saying yes. The two biggest pushes are about how the client was contacted, because <code>contact_cellular</code> = 0 and <code>contact_unknown</code> = 1 each take about 0.02 off the starting chance. The smallest 42 pushes are added together in the bottom bar.</p>
+<p>In <code>shap_values[0, :, 1]</code>, the <code>0</code> is the first row we asked about, the <code>:</code> is every column, and the <code>1</code> is the second answer in <code>classes_</code> (counting starts at 0). To explain a different answer, change the last number.</p>
+<p>The same two lines explain any row. When <code>row</code> is the first wrong guess from <a href="#q-choose">"How do I choose a row to explain?"</a>, we get this plot.</p>
+<div class="figbox mid"><span class="olabel">Example output</span><img src="assets/explain_waterfall_wrong.png" alt="A SHAP waterfall plot for a client who said yes but was guessed no. It starts at 0.098 and ends at 0.074. Blue bars: balance of 0 gives minus 0.02, month_jun of 0 minus 0.01, age 32 minus 0.01. Three red bars, contact_cellular of 1, contact_unknown of 0 and housing_yes of 0, give plus 0.01 each."></div>
+<p>This client really said yes, and the model gave them a chance of 0.07. In the plot, a <code>balance</code> of 0 is the biggest push down (−0.02), and being contacted by mobile phone (<code>contact_cellular</code> = 1) pushes up by 0.01, which is not enough to change the guess. No column gave the model a strong reason to say "yes" for this client.</p>
+<p>In your report, say what the model guessed for your row, and which columns pushed it there. For a wrong guess, say what the real answer was too.</p>
+<p>In the week 8 lab we used <code>shap.TreeExplainer</code>, which is a faster tool for tree-based models and draws the same kind of plot. For gradient boosting its numbers are scores, not chances (the plot for this same client runs from −2.352 to −2.92), so they cannot be read as a share. The tool on this page works for any model, and its numbers are always chances.</p>
+<p>If you see <code>NameError: name 'row' is not defined</code>, run the code in <a href="#q-choose">"How do I choose a row to explain?"</a> first. If you see <code>TypeError: ufunc 'isfinite' not supported for the input types</code>, a table went in without <code>.astype(float)</code>. If you see <code>ValueError: could not convert string to float</code>, one of your columns still holds text, so encode it first (see <a href="prepare.html#q-dummies">"How do I turn a text column into numbers?"</a> in the Prepare stage). If you see <code>AttributeError: This 'SVC' has no attribute 'predict_proba'</code>, your SVM was trained without chances, so train it again with <code>SVC(probability=True)</code>.</p>
+</div></div></section>
+</div>
+
+<!-- ============================================================ 3 -->
+<div class="group" id="g-sense" hidden>
+<p class="gintro">The plots show us what the model uses. They cannot tell us whether that is reasonable. The questions below check the model's top columns against what we know about the problem, and set out what these tools leave unanswered.</p>
+
+<section class="q" id="q-sensible"><button class="qhead" aria-expanded="false"><span class="title">Are my top columns sensible or surprising?<small>For each column near the top, we decide whether we would have expected the model to use it.</small></span><span class="chev">▾</span></button>
+<div class="qbody"><div class="qinner">
+<p>First, look up what each of your top columns means in your dataset's documentation. Then check how the column lines up with the target in the data itself. For a yes-or-no column, <code>pd.crosstab</code> counts each answer for each value, and <code>normalize='index'</code> turns each row of counts into shares.</p>
+<div class="extra"><span class="tag">Interactive</span> Type the name of one of your top columns <input data-key="topcol" value="poutcome_success">, then run the code below.</div>
+<div class="codebox"><button class="copy">Copy</button><pre data-code="pd.crosstab(X_test['{topcol}'], y_test, normalize='index').round(2)"></pre></div>
+<div class="outbox"><span class="olabel">Example output</span><pre class="o">y                   no   yes
+poutcome_success
+False             0.90  0.10
+True              0.35  0.65</pre></div>
+<p>In Bank Marketing, the dataset's documentation says that <code>poutcome</code> is the outcome of the previous marketing campaign. The table shows that 65% of the test clients with <code>poutcome_success</code> said yes this time, against 10% of the rest. A client who said yes before saying yes again is what we would expect, so we call this column sensible.</p>
+<p>For a number column, draw it against the target (see <a href="visualise.html#q-vnum">"How do I visualise a number column against the target?"</a> in the Visualise stage). If a top column has no link to the problem that you can explain, call it surprising, and look into it with the next question. In your report, name your top two or three columns, and say for each whether it is sensible or surprising, and why.</p>
+</div></div></section>
+
+<section class="q" id="q-leak"><button class="qhead" aria-expanded="false"><span class="title">Could my model know this column at the time of the guess?<small>A column that is only filled in after the answer is known gives the model the answer for free.</small></span><span class="chev">▾</span></button>
+<div class="qbody"><div class="qinner">
+<p>For each top column, ask when its value becomes known. If it is only known after the thing we are predicting has happened, a model that uses it will score well on our test set and be of no use for a real guess. This is called leakage.</p>
+<p>Bank Marketing has a column like this. The documentation says that <code>duration</code>, the length of the phone call, is not known before the call is made, and that the answer is known by the time the call ends. In the labs we removed it. When we put it back, the model's accuracy rises from 0.893 to 0.907 and its area under the ROC curve from 0.797 to 0.926, and permutation importance looks like this:</p>
+<div class="outbox"><span class="olabel">Example output</span><pre class="o">duration            0.224
+contact_unknown     0.018
+poutcome_success    0.017
+month_mar           0.010
+month_jun           0.008
+dtype: float64</pre></div>
+<p><code>duration</code> goes straight to the top, with more than ten times the drop of the next column. A column that towers over the others in this way is worth checking against the documentation.</p>
+<p>If you find a column like this in your own data, remove it from your table before the train and test split, then train and score your models again:</p>
+<div class="extra"><span class="tag">Interactive</span> Type the name of your table <input data-key="df" value="df"> and the column to remove <input data-key="leakcol" value="duration">, then run the code below.</div>
+<div class="codebox"><button class="copy">Copy</button><pre data-code="{df} = {df}.drop(columns=['{leakcol}'])"></pre></div>
+<p>Nothing prints when this works. If you see <code>KeyError: "['duration'] not found in axis"</code>, the column has already been removed, or the name is spelled differently. In your report, say which column you removed and why, and give the score before and after.</p>
+</div></div></section>
+
+<section class="q" id="q-limits"><button class="qhead" aria-expanded="false"><span class="title">What can these tools not tell me?<small>Permutation importance and SHAP describe the model, and there are three things they leave unanswered.</small></span><span class="chev">▾</span></button>
+<div class="qbody"><div class="qinner">
+<p>First, they show what the model uses, which may differ from what causes the answer. In Bank Marketing, the model relied on <code>duration</code> when it had it, and a long call does not make a client say yes. So write "the model relies on this column", and avoid "this column causes the answer".</p>
+<p>Second, when two columns say nearly the same thing, they share the credit. If we shuffle one, the model still has the other, so both can look less important than they are. If <a href="visualise.html#q-vheat">your heatmap in the Visualise stage</a> showed two strongly linked columns, read their importances together.</p>
+<p>Third, they can only rank the columns the model was given. Anything that matters to the problem and is missing from your table cannot appear in any of these plots.</p>
+<p>In your report, pick the limit that applies most to your own dataset, and say how it affects what you can conclude.</p>
+</div></div></section>
+</div>
+
+</div>
+
+</main>
+<script>
+const vals = {df:'df', target:'target', model:'model', rownum:'0', topcol:'poutcome_success', leakcol:'duration', whatcol:'age'};
+try{ Object.assign(vals, JSON.parse(localStorage.getItem('cw-names')||'{}')); }catch(e){}
+function sub(s){ return s.replace(/\{(\w+)\}/g, (m,k)=> vals[k] ?? m); }
+function esc(s){ return s.replace(/&/g,'&amp;').replace(/</g,'&lt;'); }
+function refresh(){ document.querySelectorAll('pre[data-code]').forEach(p=> p.innerHTML = esc(sub(p.dataset.code)));
+  document.getElementById('nm-df').textContent = vals.df; document.getElementById('nm-target').textContent = vals.target;
+  document.querySelectorAll('input[data-key]').forEach(i=>{ if(i.value!==vals[i.dataset.key]) i.value=vals[i.dataset.key]; }); }
+document.querySelectorAll('input[data-key]').forEach(i=> i.addEventListener('input', e=>{ vals[e.target.dataset.key]=e.target.value; try{localStorage.setItem('cw-names',JSON.stringify(vals));}catch(x){} refresh(); }));
+refresh();
+const nb=document.getElementById('namesbtn'), np=document.getElementById('namespanel');
+nb.addEventListener('click',()=>{ const open=np.hidden; np.hidden=!open; nb.setAttribute('aria-expanded',open); if(open) np.querySelector('input').focus(); });
+document.addEventListener('click',e=>{ if(!e.target.closest('.namesdock')){ np.hidden=true; nb.setAttribute('aria-expanded','false'); } });
+document.querySelectorAll('.copy').forEach(b=> b.addEventListener('click', ()=>{ const t = sub(b.parentElement.querySelector('pre').dataset.code); navigator.clipboard?.writeText(t).then(()=>{ b.textContent='Copied'; setTimeout(()=>b.textContent='Copy',1200); }); }));
+const qs=[...document.querySelectorAll('.q')];
+function setOpen(q, open){ q.classList.toggle('open', open); q.querySelector('.qhead').setAttribute('aria-expanded', open); }
+qs.forEach(q=> q.querySelector('.qhead').addEventListener('click', ()=>{
+  const opening = !q.classList.contains('open');
+  qs.forEach(o=>{ if(o!==q && o.classList.contains('open')) setOpen(o,false); });
+  setOpen(q, opening);
+  if(opening) setTimeout(()=> q.scrollIntoView({behavior:'smooth', block:'start'}), 60);
+}));
+let current = null;
+function pick(g, scroll){
+  if (g === current) g = null;
+  current = g;
+  document.querySelectorAll('.panel').forEach(x=>x.classList.toggle('on', x.dataset.group===g));
+  document.querySelectorAll('.group').forEach(x=>{ const on = g && x.id==='g-'+g; if(on && x.hidden){ x.hidden=false; x.classList.remove('show'); void x.offsetWidth; x.classList.add('show'); } else if(!on) x.hidden=true; });
+  if(g && scroll) document.getElementById('layout').scrollIntoView({behavior:'smooth',block:'start'});
+}
+document.querySelectorAll('.panel').forEach(a=>a.addEventListener('click',e=>{ e.preventDefault(); pick(a.dataset.group,true); }));
+function goHash(){ if(!location.hash) return; const q=document.querySelector(location.hash); if(q && q.closest('.group')){ const g=q.closest('.group').id.slice(2); if(g!==current) pick(g,false); qs.forEach(o=>{ if(o!==q) setOpen(o,false); }); setOpen(q,true); q.scrollIntoView(); } }
+goHash(); window.addEventListener('hashchange', goHash);
+// review mode: every paragraph on this page is new wording, so ?review shades all of it
+if(/[?&]review\b/.test(location.search)){ document.body.classList.add('review');
+  document.querySelectorAll('.intro-text p, .gintro, .qinner > p, .qinner li, .qhead small, .panel p, .dscard p, .extra').forEach(e=> e.setAttribute('data-draft','')); }
+</script>
+</body></html>
